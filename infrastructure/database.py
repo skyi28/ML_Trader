@@ -1,6 +1,18 @@
 """
 This python module contains a function to manipulate a PostgreSQL database.
 """
+import os
+import sys
+basedir = os.path.abspath(os.path.dirname(__file__)) + os.sep
+basedir_split = basedir.split(os.sep)
+path_to_config = ''
+for part in basedir_split:
+    path_to_config += part + os.sep
+    if part == "ML_Trader":
+        path_to_config += f'{os.sep}config'
+        break
+sys.path.append(path_to_config)
+
 import pandas as pd
 import psycopg2
 from sqlalchemy import create_engine, Engine
@@ -21,12 +33,11 @@ class Database:
         Returns:
         None
         """
-        self.config = load_config('config.yaml')
+        self.config = load_config(f'{path_to_config}{os.sep}config.yaml')
         self.logger = create_logger('database.log')
         self.engine = self.create_engine()
         self.connection = self.create_connection()
         self.cursor = self.create_cursor()
-        # self.create_needed_tables()
         
     def create_connection(self) -> psycopg2.extensions.connection:
         """
@@ -316,3 +327,4 @@ class Database:
             self.logger.error(f'count_rows_of_table: Error counting the rows: {str(e)}')
             return None
             
+Database()

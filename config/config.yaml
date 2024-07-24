@@ -3,6 +3,7 @@
 
 logging:
   log_level: DEBUG
+  log_folder: <<project_root>>/logs/
 
 postgres:
   username: technical_user

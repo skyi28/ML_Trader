@@ -1,11 +1,23 @@
 """
 This python module contains a function to create and configure a logger.
 """
+import os
+import sys
+basedir = os.path.abspath(os.path.dirname(__file__)) + os.sep
+basedir_split = basedir.split(os.sep)
+path_to_config = ''
+for part in basedir_split:
+    path_to_config += part + os.sep
+    if part == "ML_Trader":
+        path_to_config += f'config'
+        break
+sys.path.append(path_to_config)
+
 import logging
 from logging.handlers import TimedRotatingFileHandler
-from config.config import load_config
+from config import load_config
 
-config = load_config('config.yaml')
+config = load_config(f'{path_to_config}{os.sep}config.yaml')
 
 def create_logger(log_file: str, log_dir: str = 'logs') -> logging.Logger:
     """

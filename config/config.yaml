@@ -14,6 +14,8 @@ postgres:
   tables:
 
 technical_indicators:
+  indicators: ["moving_average", "exponential_moving_average", "moving_std", "periodic_highs", "periodic_lows", "bollinger_bands", "macd", "rsi", "momentum"]
+
   moving_average:
     period: 20
 

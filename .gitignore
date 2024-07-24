@@ -1,1 +1,3 @@
 logs/
+config/__pycache__/
+infrastructure/__pycache__/

@@ -14,9 +14,10 @@ import requests
 import json 
 import datetime 
 import pandas as pd
-from logger import create_logger
-from config import load_config
-from technical_indicators import TechnicalIndicators
+from infrastructure.technical_indicators import TechnicalIndicators
+from infrastructure.database import Database
+from config.config import load_config
+from infrastructure.logger import create_logger
 
 class BybitData:
     def __init__(self) -> None:
@@ -25,6 +26,7 @@ class BybitData:
         self.logger = create_logger('bybit_data.log')
         self.config = load_config(f'{path_to_config}{os.sep}config.yaml')
         self.ti = TechnicalIndicators()
+        self.db = Database()
         
         self.technical_indicators_function_mapping = {
             "moving_average": self.ti.calc_moving_average,
@@ -39,34 +41,6 @@ class BybitData:
         }
     
     def get_current_price(self, symbol="BTCUSD") -> float:
-        """
-        Get the current price of a given symbol on Bybit.
-
-        Parameters
-        ----------
-        symbol : str, optional
-            The symbol of the asset, by default "BTCUSD"
-
-        Returns
-        -------
-        datetime.datetime
-            The corresponding time
-        float
-            The current price of the asset
-
-        Raises
-        ------
-        ValueError
-            If the symbol is not valid
-
-        Examples
-        --------
-        >>> from bybit_api import GetLiveBybitData
-        >>> api = GetLiveBybitData()
-        >>> time, current_price = api.get_current_price()
-        >>> print(current_price)
-        48500.0
-        """
         params = {"category": "inverse", "symbol": symbol}
         response = json.loads(requests.get(self.current_price_url, params).text)
         last_price = float(response["result"]["list"][0]["lastPrice"])
@@ -76,7 +50,7 @@ class BybitData:
         ask_size = float(response["result"]["list"][0]["ask1Size"])
         price_change_24h = float(response["result"]["list"][0]["price24hPcnt"])
         
-        return datetime.datetime.now(), last_price, bid_price, ask_price, bid_size, ask_size, price_change_24h
+        return symbol, datetime.datetime.now(), last_price, bid_price, ask_price, bid_size, ask_size, price_change_24h
     
     def get_data_helper(self, start: datetime.datetime = None, end: datetime.datetime = None, symbol: str = "BTCUSD", interval: str = "1", limit: int = 1_000) -> pd.DataFrame:
         """
@@ -199,19 +173,66 @@ class BybitData:
             for indicator in self.config.technical_indicators.indicators:
                 try:
                     function = self.technical_indicators_function_mapping.get(indicator)
-                    data[indicator] = function(data['Open'])
+                    if indicator == "bollinger_bands":
+                        data['lower_bollinger_band'], data['upper_bollinger_band'] = function(data['Open'])
+                    else:
+                        data[indicator] = function(data['Open'])
                 except Exception as e:
                     self.logger.error(f"Error calculating technical indicator {indicator} for {symbol}. \n{e}")
             data.dropna(inplace=True)
+            data.reset_index(inplace=True, drop=True)
         
         return data
+    
+    def insert_historical_data(self, symbol: str, data: pd.DataFrame) -> None:
+        query: str = f"INSERT INTO {symbol} ("
+        for col in data.columns:
+            query += f"{col},"
+        query = query[:-1]  # remove last comma
+        
+        query += ") VALUES ("
+        for col in data.columns:
+            query += f"%s,"
+        query = query[:-1]  # remove last comma
+        
+        query += ') ON CONFLICT ("timestamp") DO UPDATE SET '
+        for col in data.columns:
+            query += f"{col} = %s,"
+        query = query[:-1]  # remove last comma
+        
+        for idx, row in data.iterrows():
+            row = tuple(row) + tuple(row)
+            rows_affected = self.db.execute_write_query(query, row)
+            if not rows_affected:
+                break
+        self.db.commit()
+        
+    def insert_latest_data(self, data: tuple) -> None:
+        query: str = f'INSERT INTO prices (symbol, "timestamp", last_price, bid_price, ask_price, bid_size, ask_size, price_change_last_24h)'
+        query += f' VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
+        query += f' ON CONFLICT (symbol) DO UPDATE SET'
+        query += f' symbol = %s,'
+        query += f' "timestamp" = %s,'
+        query += f' last_price = %s,'
+        query += f' bid_price = %s,'
+        query += f' ask_price = %s,'
+        query += f' bid_size = %s,'
+        query += f' ask_size = %s,'
+        query += f' price_change_last_24h = %s'
+        
+        row = tuple(data) + tuple(data)
+        self.db.execute_write_query(query, row)
+        self.db.commit()              
 
-gbd = BybitData()
-print(gbd.get_historic_data(
-    # start=datetime.datetime(2024, 7, 23),
-    # end=datetime.datetime(2024, 7, 25),
-    symbol="BTCUSD",
-    interval="1",
-    limit=1000,
-    calc_technical_indicators=True
-))
+# gbd = BybitData()
+# data = gbd.get_historic_data(
+#     # start=datetime.datetime(2024, 7, 23),
+#     # end=datetime.datetime(2024, 7, 25),
+#     symbol="BTCUSD",
+#     interval="1",
+#     limit=1000,
+#     calc_technical_indicators=True
+# )
+# gbd.insert_latest_data(
+#     gbd.get_current_price('BTCUSD')
+# )

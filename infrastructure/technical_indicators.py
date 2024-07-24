@@ -12,7 +12,7 @@ sys.path.append(path_to_config)
 
 import pandas as pd
 import numpy as np
-from config import load_config
+from config.config import load_config
 
 class TechnicalIndicators:
     def __init__(self) -> None:

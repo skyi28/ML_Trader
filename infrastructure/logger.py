@@ -15,7 +15,7 @@ sys.path.append(path_to_config)
 
 import logging
 from logging.handlers import TimedRotatingFileHandler
-from config import load_config
+from config.config import load_config
 
 config = load_config(f'{path_to_config}{os.sep}config.yaml')
 

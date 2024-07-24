@@ -9,15 +9,14 @@ path_to_config = ''
 for part in basedir_split:
     path_to_config += part + os.sep
     if part == "ML_Trader":
-        path_to_config += f'{os.sep}config'
+        path_to_config += f'\config'
         break
-sys.path.append(path_to_config)
 
 import pandas as pd
 import psycopg2
 from sqlalchemy import create_engine, Engine
-from config import load_config
-from logger import create_logger
+from config.config import load_config
+from infrastructure.logger import create_logger
 
 class Database:
     def __init__(self) -> None:

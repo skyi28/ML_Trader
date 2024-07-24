@@ -1,0 +1,47 @@
+# Application configuration
+# Use <<project_root> as placeholder for the project root directory
+
+logging:
+  log_level: DEBUG
+
+postgres:
+  username: technical_user
+  password: postgresql
+  port: 5432
+  host: 127.0.0.1
+  database: financial_data
+  tables:
+
+technical_indicators:
+  moving_average:
+    period: 20
+
+  exponential_moving_average:
+    period: 20
+
+  moving_std:
+    period: 20
+
+  periodic_highs:
+    period: 20
+
+  periodic_lows:
+    period: 20
+
+  bollinger_bands:
+    period: 20
+    std_dev: 1
+
+  macd:
+    longer: 26
+    shorter: 12
+
+  rsi:
+    period: 14
+
+  momentum:
+    period: 10
+
+stocks:
+  company_data_column_names_and_types: ['timestamp TIMESTAMP','symbol VARCHAR','country VARCHAR', 'industry VARCHAR', 'sector VARCHAR', 'fullTimeEmployees INT', 'auditRisk INT', 'boardRisk INT', 'compensationRisk INT', 'shareHolderRightsRisk INT', 'overallRisk INT', 'dividendYield FLOAT', 'fiveYearAvgDividendYield FLOAT', 'payoutRatio FLOAT', 'beta FLOAT', 'marketCap FLOAT', 'profitMargins FLOAT', 'heldPercentInsiders FLOAT', 'heldPercentInstitutions FLOAT', 'shortRatio FLOAT', 'bookValue FLOAT', 'priceToBook FLOAT', 'quickRatio FLOAT', 'currentRatio FLOAT']
+  symbols: ['AAPL','MSFT','AMZN','NVDA','BRK-B','GOOGL','TSLA','XOM','UNH','META','JNJ','JPM','V','PG','HD','MA','CVX','ABBV','MRK','LLY','AVGO','PEP','KO','PFE','TMO','COST','BAC','CSCO','WMT','MCD']

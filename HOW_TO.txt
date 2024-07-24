@@ -1,0 +1,14 @@
+Conda environment
+    conda activate py3124
+
+Code rating
+    pylint path_to_file
+
+Start / Stop database
+    cd A:\PostgreSQL\16\bin
+    .\pg_ctl.exe start -D "A:\PostgreSQL\16\data"  
+    .\pg_ctl.exe stop -D "A:\PostgreSQL\16\data"  
+
+Start pgAdmin
+    cd "A:\PostgreSQL\16\pgAdmin 4\runtime"
+    start .\pgAdmin4.exe

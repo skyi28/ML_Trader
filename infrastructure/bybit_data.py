@@ -1,3 +1,6 @@
+"""
+This python module contains functions to receive data via the Bybit API.
+"""
 import os
 import sys
 basedir = os.path.abspath(os.path.dirname(__file__)) + os.sep
@@ -21,6 +24,29 @@ from infrastructure.logger import create_logger
 
 class BybitData:
     def __init__(self) -> None:
+        """
+        Initialize the BybitData class.
+
+        This class is responsible for fetching and processing data from Bybit API.
+        It includes methods for fetching current prices, historical data, and calculating technical indicators.
+
+        Attributes:
+        -----------
+        current_price_url : str
+            The URL for fetching current prices from Bybit API.
+        hist_prices_url : str
+            The URL for fetching historical prices from Bybit API.
+        logger : Logger
+            The logger object for logging errors and information.
+        config : dict
+            The configuration settings loaded from the config file.
+        ti : TechnicalIndicators
+            The instance of the TechnicalIndicators class for calculating technical indicators.
+        db : Database
+            The instance of the Database class for interacting with the database.
+        technical_indicators_function_mapping : dict
+            A dictionary mapping the names of technical indicators to their corresponding functions in the TechnicalIndicators class.
+        """
         self.current_price_url = "https://api.bybit.com/v5/market/tickers"
         self.hist_prices_url = "https://api.bybit.com/v5/market/mark-price-kline"
         self.logger = create_logger('bybit_data.log')
@@ -41,6 +67,15 @@ class BybitData:
         }
     
     def get_current_price(self, symbol="BTCUSD") -> float:
+        """
+        Fetch the current price of a specified symbol from Bybit API.
+
+        Parameters:
+        symbol (str): The symbol of the asset. Default is "BTCUSD".
+
+        Returns:
+            tuple: A tuple containing the symbol, current timestamp, last price, bid price, ask price, bid size, ask size, and price change percentage in the last 24 hours.
+        """
         params = {"category": "inverse", "symbol": symbol}
         response = json.loads(requests.get(self.current_price_url, params).text)
         last_price = float(response["result"]["list"][0]["lastPrice"])
@@ -73,19 +108,6 @@ class BybitData:
         -------
         pd.DataFrame
             A pandas dataframe containing the historical data
-
-        Examples
-        --------
-        >>> from bybit_api import GetLiveBybitData
-        >>> api = GetLiveBybitData()
-        >>> data = api.get_data(start=datetime.datetime(2022, 1, 1), end=datetime.datetime(2022, 1, 10))
-        >>> print(data.head())
-        Timestamp       Open       Close
-        0  2022-01-04  48500.0000  48500.0000
-        1  2022-01-05  48500.0000  48500.0000
-        2  2022-01-06  48500.0000  48500.0000
-        3  2022-01-07  48500.0000  48500.0000
-        4  2022-01-08  48500.0000  48500.0000
         """
         params = {"category":"inverse","symbol":"BTCUSD","interval":interval, "limit":limit}
         if start and end:
@@ -107,45 +129,27 @@ class BybitData:
     
     def get_historic_data(self, start: datetime.datetime = None, end: datetime.datetime = None, 
                           symbol: str ="BTCUSD", interval: str = "1", limit: int = 1_000, 
-                          calc_technical_indicators: bool = True):
+                          calc_technical_indicators: bool = True) -> pd.DataFrame:
         """
-        Get  historical data for a given symbol on Bybit.
+        Helper function for get_data function. Use get_data to receive data for a given symbol from Bybit.
 
         Parameters
         ----------
-        start : datetime.datetime
-            The start date of the data
-        end : datetime.datetime
-            The end date of the data
+        start : datetime.datetime, optional
+            The start date of the data. Default is None.
+        end : datetime.datetime, optional
+            The end date of the data. Default is None.
         symbol : str, optional
-            The symbol of the asset, by default "BTCUSD"
+            The symbol of the asset. Default is "BTCUSD".
         interval : str, optional
-            The interval of the data, by default "1" (1=1min,3,5,15,30,60,120,240,360,720,D,M,W)
+            The interval of the data. Default is "1".
         limit : int, optional
-            The maximum number of data points to retrieve, by default 1000
+            The maximum number of data points to retrieve. Default is 1000.
 
         Returns
         -------
         pd.DataFrame
-            A pandas dataframe containing the historical data
-
-        Raises
-        ------
-        ValueError
-            If the symbol or interval is not valid
-
-        Examples
-        --------
-        >>> from bybit_api import GetLiveBybitData
-        >>> api = GetLiveBybitData()
-        >>> data = api.get_all_data(start=datetime.datetime(2022, 1, 1), end=datetime.datetime(2022, 1, 10))
-        >>> print(data.head())
-            Timestamp       Open       Close
-        0  2022-01-04  48500.0000  48500.0000
-        1  2022-01-05  48500.0000  48500.0000
-        2  2022-01-06  48500.0000  48500.0000
-        3  2022-01-07  48500.0000  48500.0000
-        4  2022-01-08  48500.0000  48500.0000
+            A pandas dataframe containing the historical data.
         """
         data = []
         try:
@@ -185,6 +189,20 @@ class BybitData:
         return data
     
     def insert_historical_data(self, symbol: str, data: pd.DataFrame) -> None:
+        """
+        Inserts historical data into the database.
+
+        This function constructs an SQL query to insert historical data into a specified table in the database.
+        If a record with the same timestamp already exists, it updates the existing record with the new data.
+
+        Parameters:
+        symbol (str): The symbol of the asset for which the data is being inserted.
+        data (pd.DataFrame): A pandas DataFrame containing the historical data to be inserted.
+            The DataFrame should have columns corresponding to the database table columns.
+
+        Returns:
+            None
+        """
         query: str = f"INSERT INTO {symbol} ("
         for col in data.columns:
             query += f"{col},"
@@ -208,6 +226,26 @@ class BybitData:
         self.db.commit()
         
     def insert_latest_data(self, data: tuple) -> None:
+        """
+        Inserts the latest price data into the 'prices' table in the database.
+
+        This function constructs an SQL query to insert the latest price data into the 'prices' table.
+        If a record with the same symbol already exists, it updates the existing record with the new data.
+
+        Parameters:
+        data (tuple): A tuple containing the following data:
+            symbol (str): The symbol of the asset.
+            timestamp (datetime.datetime): The timestamp of the data.
+            last_price (float): The last price of the asset.
+            bid_price (float): The bid price of the asset.
+            ask_price (float): The ask price of the asset.
+            bid_size (float): The bid size of the asset.
+            ask_size (float): The ask size of the asset.
+            price_change_last_24h (float): The price change percentage in the last 24 hours.
+
+        Returns:
+            None
+        """
         query: str = f'INSERT INTO prices (symbol, "timestamp", last_price, bid_price, ask_price, bid_size, ask_size, price_change_last_24h)'
         query += f' VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
         query += f' ON CONFLICT (symbol) DO UPDATE SET'

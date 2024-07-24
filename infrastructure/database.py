@@ -1,5 +1,5 @@
 """
-This python module contains a function to manipulate a PostgreSQL database.
+This python module contains functions to manipulate a PostgreSQL database.
 """
 import os
 import sys

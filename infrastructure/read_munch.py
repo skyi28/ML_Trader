@@ -1,3 +1,6 @@
+"""
+This python module contains a function to read a munch object and returns a list of tuples containing keys and values.
+"""
 from munch import Munch
 
 def read_munch(munch_obj, parent_key=''):

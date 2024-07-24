@@ -1,3 +1,6 @@
+"""
+This python module contains functions to calculate various technical indicators.
+"""
 import os
 import sys
 basedir = os.path.abspath(os.path.dirname(__file__)) + os.sep

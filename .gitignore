@@ -2,3 +2,4 @@ logs/
 config/__pycache__/
 infrastructure/__pycache__/
 models/__pycache__/
+website/__pycache__/

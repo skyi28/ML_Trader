@@ -11,7 +11,11 @@ postgres:
   port: 5432
   host: 127.0.0.1
   database: financial_data
-  tables:
+
+webserver:
+  host: 127.0.0.1
+  port: 5000
+  debug_mode: True
 
 tradeable_symbols: ["BTCUSD"]
 

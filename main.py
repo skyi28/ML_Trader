@@ -15,12 +15,15 @@ from config.config import load_config
 from infrastructure.database import Database
 from infrastructure.bybit_data import BybitData
 from infrastructure.logger import create_logger
+from website.app import Application
 
 logger = create_logger('startup.log')
 logger.info('Starting ML Trader...')
 
 logger.info(f'Loading config.yaml from {path_to_config}{os.sep}config{os.sep}config.yaml')
 config = load_config(f'{path_to_config}{os.sep}config{os.sep}config.yaml')
+
+# TODO Execute cmd commands to start the database
 
 logger.info('Establishing connection to database')
 db = Database()
@@ -51,3 +54,8 @@ bd = BybitData()
 # Start data thread
 data_thread = threading.Thread(target=bd.get_data_thread)
 data_thread.start()
+
+logger.info('Start web application')
+app = Application()
+# Start web application - works only if this is the main thread 
+app.run()

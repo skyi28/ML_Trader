@@ -21,6 +21,8 @@ tradeable_symbols: ["BTCUSD"]
 
 price_update_interval: 1
 
+# TODO Output paths for models
+
 technical_indicators:
   indicators: ["moving_average", "exponential_moving_average", "moving_std", "periodic_highs", "periodic_lows", "bollinger_bands", "macd", "rsi", "momentum"]
 

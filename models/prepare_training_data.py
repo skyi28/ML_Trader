@@ -141,7 +141,7 @@ class PrepareTrainingData:
         data['direction'] = data['direction'].replace(-1, 0)
         return data
     
-    # TODO add first difference method
+    # TODO add first difference method as step in data pipeline
     
     def create_features_and_targets(self, data: pd.DataFrame, target_column: str = 'direction') -> tuple:
         """
@@ -162,3 +162,5 @@ class PrepareTrainingData:
         features = data.loc[:, data.columns != target_column]
         target = data.loc[:, target_column]
         return features, target
+    
+    # TODO Data preperation for other models

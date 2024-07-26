@@ -7,9 +7,11 @@ from website.app import db
 from infrastructure.database import Database
 
 
-endpoint = Blueprint('endpoints', __name__) # could be that this needs to be renamed to endpoint
+endpoint = Blueprint('endpoints', __name__)
 
 postgres_db = Database()
+
+# TODO Figure out how to use HTML file as blueprint for other ones
 
 @endpoint.route('/')
 def index():
@@ -52,6 +54,8 @@ def sign_up():
         password2 = request.form.get('password2')
 
         user = User.query.filter_by(email=email).first()
+        
+        # TODO Make this checks more meaningful 
         if user:
             flash('Email already exists.', category='error')
         elif len(email) < 4:
@@ -63,7 +67,6 @@ def sign_up():
         elif len(password1) < 7:
             flash('Password must be at least 7 characters.', category='error')
         else:
-            # TODO ID must be changed --> read last given ID and add 1
             new_user_id = postgres_db.provide_uniue_user_id()
             new_user = User(id=new_user_id, email=email, first_name=first_name, last_name=last_name, password=generate_password_hash(password1))
             db.session.add(new_user)

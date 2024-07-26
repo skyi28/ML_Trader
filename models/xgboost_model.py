@@ -77,6 +77,7 @@ class XGBoostModel:
         Returns:
         - xgb.XGBClassifier | xgb.XGBRegressor based on the specified mode.
         """
+        # TODO Error handling
         if mode == 'direction':
             model = xgb.XGBClassifier()
         if mode == 'return':
@@ -89,10 +90,16 @@ class XGBoostModel:
         return model
     
     def train(self, model, features: pd.DataFrame, target: pd.Series):
-        #d_matrix = xgb.DMatrix(features, target, enable_categorical=True)
+        # TODO Error handling
         model.fit(features, target)
         return model
     
     def predict(self, model, features: pd.DataFrame):
+        # TODO Error handling
         return model.predict(features)
         
+    # TODO Function for calculating error metrics
+    
+    # TODO Function for saving model as pickle file
+    
+    # TODO Function for loading model from pickle file

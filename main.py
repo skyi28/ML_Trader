@@ -49,11 +49,11 @@ for symbol in config.tradeable_symbols:
     unique_constraints = ['symbol']
     db.create_table('prices', column_names_and_types, unique_constraints)
     
-# logger.info('Starting ByBit data thread')
-# bd = BybitData()
-# # Start data thread
-# data_thread = threading.Thread(target=bd.get_data_thread)
-# data_thread.start()
+logger.info('Starting ByBit data thread')
+bd = BybitData()
+# Start data thread
+data_thread = threading.Thread(target=bd.get_data_thread)
+data_thread.start()
 
 # Create user table
 db.create_table('"user"', ['id INT','email VARCHAR','password VARCHAR','first_name VARCHAR','last_name VARCHAR'], primary_keys=['id'])

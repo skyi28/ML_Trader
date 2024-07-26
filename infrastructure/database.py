@@ -27,10 +27,10 @@ class Database:
         establishing a connection to the PostgreSQL database, creating an engine and a cursor.
 
         Parameters:
-        None
+        - None
 
         Returns:
-        None
+        - None
         """
         self.config = load_config(f'{path_to_config}{os.sep}config.yaml')
         self.logger = create_logger('database.log')
@@ -43,10 +43,10 @@ class Database:
         This function creates a connection to a PostgreSQL database using the provided configuration settings.
 
         Parameters:
-        self (Database): The instance of the Database class.
+        - self (Database): The instance of the Database class.
 
         Returns:
-        psycopg2.extensions.connection: A connection object to the PostgreSQL database. If the connection fails,
+        - psycopg2.extensions.connection: A connection object to the PostgreSQL database. If the connection fails,
         it returns None.
         """
         try:
@@ -66,10 +66,10 @@ class Database:
         This function creates a cursor for executing SQL commands in the PostgreSQL database.
 
         Parameters:
-        self (Database): The instance of the Database class.
+        - self (Database): The instance of the Database class.
 
         Returns:
-        psycopg2.extensions.cursor: A cursor object for executing SQL commands. If the cursor creation fails,
+        - psycopg2.extensions.cursor: A cursor object for executing SQL commands. If the cursor creation fails,
         it returns None. The cursor object is used to interact with the database and execute SQL queries.
         """
         try:
@@ -85,10 +85,10 @@ class Database:
         This function creates a SQLAlchemy engine for connecting to a PostgreSQL database.
 
         Parameters:
-        self (Database): The instance of the Database class.
+        - self (Database): The instance of the Database class.
 
         Returns:
-        Engine: A SQLAlchemy engine object for interacting with the PostgreSQL database. If the engine creation fails,
+        - Engine: A SQLAlchemy engine object for interacting with the PostgreSQL database. If the engine creation fails,
         it returns None. The engine object is used to create a connection pool and manage connections to the database.
         """
         try:
@@ -112,10 +112,10 @@ class Database:
         It is essential to call this function after executing write queries to ensure that the changes are saved.
 
         Parameters:
-        self (Database): The instance of the Database class.
+        - self (Database): The instance of the Database class.
 
         Returns:
-        None: This function does not return any value.
+        - None
         """
         try:
             self.connection.commit()
@@ -188,6 +188,7 @@ class Database:
             try:
                 result = pd.read_sql_query(query, self.engine)
                 self.logger.debug('execute_read_query: Returns a DataFrame!')
+                return result
             except Exception as e:
                 self.logger.error(f'execute_read_query: Error reading the query: {query} \n{str(e)}')
         

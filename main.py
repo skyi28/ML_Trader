@@ -9,6 +9,8 @@ for part in basedir_split:
         break
 sys.path.append(path_to_config)
 
+import threading
+
 from config.config import load_config
 from infrastructure.database import Database
 from infrastructure.bybit_data import BybitData
@@ -44,3 +46,8 @@ for symbol in config.tradeable_symbols:
     unique_constraints = ['symbol']
     db.create_table('prices', column_names_and_types, unique_constraints)
     
+logger.info('Starting ByBit data thread')
+bd = BybitData()
+# Start data thread
+data_thread = threading.Thread(target=bd.get_data_thread)
+data_thread.start()

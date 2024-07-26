@@ -60,6 +60,16 @@ class BybitData:
         }
         
     def get_data_thread(self):
+        """
+        This function is responsible for continuously fetching and updating data from Bybit API.
+        It runs in an infinite loop, updating data at regular intervals.
+
+        Parameters:
+        - None
+
+        Returns:
+        - None
+        """
         last_update_timestamp = -1
         self.logger.info(f'Starting data thread: {datetime.datetime.now()}')
         while True:

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>HEADER</h1>
+    </header>
+    <div class="container">
+        <div class="sidebar" id="sidebar">
+            <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+            <ul class="no_border">
+                <li><a href="#"><span class="icon">📊</span><span class="text">Reports</span></a></li>
+                <li><a href="#"><span class="icon">📊</span><span class="text">Reports</span></a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <button class="reset-zoom-btn" onclick="reset_zoom()">Reset Zoom</button>
+            <div class="line-graph-container"> <!-- New container for the graph -->
+                <canvas id="lineGraph"></canvas>
+            </div>
+        </div>
+        <div class="table-container">
+            <h2>Data Table</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Header 1</th>
+                        <th>Header 2</th>
+                        <th>Header 3</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Data 1</td>
+                        <td>Data 2</td>
+                        <td>Data 3</td>
+                    </tr>
+                    <tr>
+                        <td>Data 4</td>
+                        <td>Data 5</td>
+                        <td>Data 6</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <script src="{{ url_for('static', filename='js/chart.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+
+    <script>
+        const ctx = document.getElementById('lineGraph').getContext('2d');
+        var lineGraph = fetch_chart_data('{{ symbol }}', '50', ctx);
+        // lineGraph = createLineGraph(
+        //     ctx,
+        //     ['a','b'], // Labels
+        //     [10,20], // Data
+        //     '{{ symbol }}', // Label
+        //     'rgba(75, 192, 192, 1)', // Line color
+        //     'rgba(75, 192, 192, 0.2)', // Fill color
+        //     'Month', // X-axis title
+        //     'Value' // Y-axis title
+        // );
+
+        function reset_zoom() {
+            lineGraph.reset_zoom();
+        }
+    </script>
+</body>
+</html>

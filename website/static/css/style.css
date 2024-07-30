@@ -1,0 +1,201 @@
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Full viewport height */
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #00090f;
+    color: #ffffff;
+    overflow: hidden; /* Prevent scrollbars */
+}
+
+header {
+    width: 100%;
+    background-color: #011627;
+    color: #ffffff;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    position: relative;
+    z-index: 1000; /* Ensure header is above other elements */
+    flex-shrink: 0; /* Prevent header from shrinking */
+}
+
+.container {
+    display: flex;
+    flex: 1; /* Fill available space */
+    margin: 10px; /* Space around container */
+    gap: 10px; /* Gap between flex items */
+    overflow: hidden; /* Prevent overflow */
+}
+
+.sidebar {
+    width: 10%; /* Expanded sidebar width */
+    overflow-y: auto; /* Allow scrolling if needed */
+    background-color: #011627;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    transition: width 0.3s, padding 0.3s;
+    position: relative;
+    z-index: 500; /* Ensure it stays below the header */
+}
+
+.sidebar.collapsed {
+    width: 50px; /* Collapsed sidebar width */
+    padding: 20px 5px; /* Adjust padding to fit collapsed width */
+}
+
+.sidebar h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.sidebar.collapsed h2 {
+    display: none; /* Hide sidebar title in collapsed state */
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar ul li {
+    margin: 10px 0;
+}
+
+.sidebar ul li a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: white;
+    transition: color 0.3s;
+    padding: 5px; /* Add padding for clickable area */
+}
+
+.sidebar ul li a:hover {
+    color: #4BC0C0; /* Optional: change color on hover */
+}
+
+.sidebar ul li a span.icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    width: 40px; /* Icon size */
+}
+
+.sidebar ul li a span.text {
+    margin-left: 10px;
+    display: inline-block; /* Ensure text is displayed inline with icon */
+}
+
+.sidebar.collapsed ul li a span.text {
+    display: none; /* Hide text in collapsed state */
+}
+
+.sidebar.collapsed ul li a span.icon {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center; /* Center icon in collapsed state */
+}
+
+.sidebar .toggle-btn {
+    display: block;
+    background-color: #011627;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    font-size: 24px;
+}
+
+.main-content {
+    flex: 1; /* Fill available space */
+    background-color: #011627;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* Prevent overflow */
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+}
+
+.table-container {
+    flex: 0.5; /* Adjust this to your preference */
+    overflow-y: auto; /* Allow scrolling if needed */
+    background-color: #011627;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+    color: #000;
+}
+
+.no_border {
+    border: none;
+}
+
+.no_border th, .no_border td {
+    border: none;
+}
+
+.reset-zoom-btn {
+    display: block;
+    width: 10%;
+    background-color: #4BC0C0; /* Button color */
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    margin-top: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    text-align: center;
+}
+
+.reset-zoom-btn:hover {
+    background-color: #36a9a4; /* Darker shade for hover effect */
+}
+
+.main-content {
+    flex: 1; /* Fill available space */
+    background-color: #011627;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* Prevent overflow */
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+}
+
+.line-graph-container {
+    flex: 1; /* Take up available space */
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+}
+
+#lineGraph {
+    width: 99% !important; /* Full width of its container */
+    height: 99% !important; /* Full height of its container */
+}

@@ -30,8 +30,10 @@ def create_app():
     db.init_app(app)
 
     from website.endpoints import endpoint
+    from website.api import api
 
     app.register_blueprint(endpoint, url_prefix='/')
+    app.register_blueprint(api, url_prefix='/')
 
     from website.user import User
 

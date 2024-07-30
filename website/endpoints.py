@@ -17,6 +17,10 @@ postgres_db = Database()
 def index():
     return f'Hello World'
 
+@endpoint.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html', user=current_user, symbol='BTCUSD')
+
 @endpoint.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':

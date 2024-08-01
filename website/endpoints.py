@@ -100,7 +100,7 @@ def sign_up():
 
     Returns:
     render_template: A Flask function that renders a template with the provided arguments.
-        - 'sign_up2.html': The name of the template file to render.
+        - 'sign_up.html': The name of the template file to render.
         - user: The current user object. If the user is not logged in, this will be None.
 
     redirect: A Flask function that redirects the user to a different URL.
@@ -135,4 +135,4 @@ def sign_up():
             flash('Account created!', category='success')
             return redirect(url_for('endpoints.index'))
 
-    return render_template("sign_up2.html", user=current_user)
+    return render_template("sign_up.html", user=current_user)

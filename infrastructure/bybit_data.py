@@ -72,6 +72,7 @@ class BybitData:
         """
         last_update_timestamp = -1
         self.logger.info(f'Starting data thread: {datetime.datetime.now()}')
+        # TODO Check what the last timestamp in the database is and automatically update the data if necessary
         while True:
             try:
                 # Update data as soon as bar closed

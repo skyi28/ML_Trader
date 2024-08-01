@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, flash, request, url_for
+from flask import Blueprint, render_template, redirect, flash, request, url_for, send_from_directory
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -12,6 +12,10 @@ endpoint = Blueprint('endpoints', __name__)
 postgres_db = Database()
 
 # TODO Figure out how to use HTML file as blueprint for other ones
+
+@endpoint.route('/favicon.ico')
+def favicon():
+    return url_for('static', filename='images/favicon.ico')
 
 @endpoint.route('/')
 def index():

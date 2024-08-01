@@ -73,17 +73,20 @@ class BybitData:
         last_update_timestamp = -1
         self.logger.info(f'Starting data thread: {datetime.datetime.now()}')
         while True:
-            # Update data as soon as bar closed
-            if datetime.datetime.now().second == 0:
-                for symbol in self.config.tradeable_symbols:
-                    hist_data = self.get_historic_data(symbol=symbol, limit=100)
-                    self.insert_historical_data(symbol=symbol, data=hist_data)
-                    
-            # Update current price each second
-            if last_update_timestamp + self.config.price_update_interval < time.time():
-                latest_data = self.get_current_price()
-                self.insert_latest_data(data=latest_data)
-                last_update_timestamp = time.time()
+            try:
+                # Update data as soon as bar closed
+                if datetime.datetime.now().second == 0:
+                    for symbol in self.config.tradeable_symbols:
+                        hist_data = self.get_historic_data(symbol=symbol, limit=100)
+                        self.insert_historical_data(symbol=symbol, data=hist_data)
+                        
+                # Update current price each second
+                if last_update_timestamp + self.config.price_update_interval < time.time():
+                    latest_data = self.get_current_price()
+                    self.insert_latest_data(data=latest_data)
+                    last_update_timestamp = time.time()
+            except Exception as e:
+                self.logger.error(f'Error in data thread: {str(e)}')
     
     def get_current_price(self, symbol="BTCUSD") -> float:
         """

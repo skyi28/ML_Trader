@@ -19,10 +19,37 @@ def index():
 
 @endpoint.route('/dashboard')
 def dashboard():
+    """
+    This function renders the dashboard page with the current user's information and a default symbol.
+
+    Parameters:
+    None
+
+    Returns:
+    render_template: A Flask function that renders a template with the provided arguments.
+        - 'dashboard.html': The name of the template file to render.
+        - user: The current user object.
+        - symbol: A default symbol to display on the dashboard.
+    """
     return render_template('dashboard.html', user=current_user, symbol='BTCUSD')
 
 @endpoint.route('/login', methods=['GET', 'POST'])
 def login():
+    """
+    This function handles user login. It checks the user's email and password against the database,
+    and logs the user in if the credentials are correct. If the user is already logged in, they are redirected to their account page.
+
+    Parameters:
+    - None
+
+    Returns:
+    render_template: A Flask function that renders a template with the provided arguments.
+        - 'login.html': The name of the template file to render.
+        - user: The current user object. If the user is not logged in, this will be None.
+
+    redirect: A Flask function that redirects the user to a different URL.
+        - url_for('endpoint.account'): The URL to redirect the user to after successful login.
+    """
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
@@ -44,12 +71,37 @@ def login():
 @endpoint.route('/logout')
 @login_required
 def logout():
+    """
+    This function handles user logout. It logs the user out of the application and redirects them to the login page.
+
+    Parameters:
+    - None
+
+    Returns:
+    redirect: A Flask function that redirects the user to a different URL.
+        - url_for('endpoint.login'): The URL to redirect the user to after successful logout.
+    """
     logout_user()
     return redirect(url_for('endpoint.login'))
 
 
 @endpoint.route('/sign-up', methods=['GET', 'POST'])
 def sign_up():
+    """
+    This function handles user sign-up. It validates user input, checks if the email already exists,
+    and creates a new user in the database if the input is valid.
+
+    Parameters:
+    - request: A Flask request object containing the user's input.
+
+    Returns:
+    render_template: A Flask function that renders a template with the provided arguments.
+        - 'sign_up2.html': The name of the template file to render.
+        - user: The current user object. If the user is not logged in, this will be None.
+
+    redirect: A Flask function that redirects the user to a different URL.
+        - url_for('endpoints.index'): The URL to redirect the user to after successful sign-up.
+    """
     if request.method == 'POST':
         email = request.form.get('email')
         first_name = request.form.get('firstName')

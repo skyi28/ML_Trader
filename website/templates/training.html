@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Drop-down Menu</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/signup.css') }}">
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const container = document.querySelector('.container');
+            const form = document.querySelector('form');
+            const button = document.getElementById('addDropdownButton');
+
+            const options = ['Option 1', 'Option 2', 'Option 3', 'Option 4'];
+            let dropdownCount = 1;
+
+            button.addEventListener('click', function () {
+                addDropdown();
+            });
+
+            function addDropdown() {
+                const selectedValues = Array.from(document.querySelectorAll('select')).map(select => select.value);
+                const availableOptions = options.filter(option => !selectedValues.includes(option));
+
+                if (availableOptions.length > 0) {
+                    dropdownCount++;
+
+                    const formGroup = document.createElement('div');
+                    formGroup.className = 'form-group';
+                    formGroup.id = `formGroup${dropdownCount}`;
+
+                    const label = document.createElement('h3');
+                    const labelElement = document.createElement('label');
+                    labelElement.setAttribute('for', `dropdown${dropdownCount}`);
+                    labelElement.textContent = `Choose another option`;
+                    label.appendChild(labelElement);
+
+                    const select = document.createElement('select');
+                    select.id = `dropdown${dropdownCount}`;
+                    select.className = 'form-control';
+                    select.addEventListener('change', updateAllDropdowns);
+
+                    availableOptions.forEach(option => {
+                        const newOption = document.createElement('option');
+                        newOption.value = option;
+                        newOption.textContent = option;
+                        select.appendChild(newOption);
+                    });
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.type = 'button';
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.className = 'delete_btn';
+                    deleteButton.addEventListener('click', function () {
+                        formGroup.remove();
+                        updateAllDropdowns();
+                    });
+
+                    formGroup.appendChild(label);
+                    formGroup.appendChild(select);
+                    formGroup.appendChild(deleteButton);
+                    form.insertBefore(formGroup, button);
+                }
+
+                if (availableOptions.length <= 1) {
+                    button.style.display = 'none';
+                } else {
+                    button.style.display = 'block';
+                }
+            }
+
+            function updateAllDropdowns() {
+                const allSelectedValues = Array.from(document.querySelectorAll('select')).map(select => select.value);
+
+                document.querySelectorAll('select').forEach(select => {
+                    const currentValue = select.value;
+                    const availableOptions = options.filter(option => !allSelectedValues.includes(option) || option === currentValue);
+
+                    select.innerHTML = '';
+                    availableOptions.forEach(option => {
+                        const newOption = document.createElement('option');
+                        newOption.value = option;
+                        newOption.textContent = option;
+                        newOption.selected = option === currentValue;
+                        select.appendChild(newOption);
+                    });
+                });
+
+                const remainingOptions = options.filter(option => !allSelectedValues.includes(option));
+                if (remainingOptions.length > 0) {
+                    button.style.display = 'block';
+                } else {
+                    button.style.display = 'none';
+                }
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <form>
+            <div class="form-group">
+                <h3><label for="dropdown1">Choose an option</label></h3>
+                <select id="dropdown1" class="form-control" onchange="updateAllDropdowns()">
+                    <option value="" disabled selected>Select an option</option>
+                    <option value="Option 1">Option 1</option>
+                    <option value="Option 2">Option 2</option>
+                    <option value="Option 3">Option 3</option>
+                    <option value="Option 4">Option 4</option>
+                </select>
+            </div>
+            <button type="button" id="addDropdownButton" class="subs_btn">Add Another Option</button>
+        </form>
+    </div>
+</body>
+</html>

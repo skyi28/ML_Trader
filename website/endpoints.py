@@ -21,6 +21,10 @@ def favicon():
 def index():
     return f'Hello World'
 
+@endpoint.route('/training')
+def training():
+    return render_template('training.html')
+
 @endpoint.route('/dashboard')
 def dashboard():
     """

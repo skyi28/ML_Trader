@@ -21,9 +21,12 @@ def favicon():
 def index():
     return f'Hello World'
 
-@endpoint.route('/training')
+@endpoint.route('/training', methods=['GET', 'POST'])
 def training():
-    return render_template('training.html')
+    if request.method == 'GET':
+        return render_template('training.html')
+    if request.method == 'POST':
+        return f"{request.form.to_dict()}"
 
 @endpoint.route('/dashboard')
 def dashboard():

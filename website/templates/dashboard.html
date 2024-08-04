@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
 </head>
 <body>
     <header>
@@ -71,7 +71,8 @@
         // );
 
         function reset_zoom() {
-            lineGraph.reset_zoom();
+            console.log('reset_zoom');
+            lineGraph.resetZoom();
         }
     </script>
 </body>

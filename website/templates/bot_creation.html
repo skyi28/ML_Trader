@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Drop-down Menu</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bot_creation.css') }}">
+    <script src="{{ url_for('static', filename='js/bot_creation.js') }}"></script>
+</head>
+<body>
+    <header>
+        <h1>HEADER</h1>
+    </header>
+    <div class="container">
+        <form method="POST" action="/training">
+            <!-- Cryptocurrency and Time Frame Selection -->
+            <div class="crypto-section section">
+                <h3><label for="crypto_currency">Choose a Cryptocurrency and Time Frame</label></h3>
+                <select id="crypto_currency" class="form-control" name="crypto_currency">
+                    <option value="" disabled selected>Select a cryptocurrency</option>
+                    <option value="bitcoin">Bitcoin</option>
+                    <option value="ethereum">Ethereum</option>
+                    <option value="litecoin">Litecoin</option>
+                    <option value="ripple">Ripple</option>
+                </select>
+                <select id="time_frame" class="form-control" name="time_frame">
+                    <option value="" disabled selected>Select a time frame</option>
+                    <option value="1min">1 Minute</option>
+                    <option value="5min">5 Minutes</option>
+                    <option value="15min">15 Minutes</option>
+                    <option value="1hour">1 Hour</option>
+                </select>
+            </div>
+
+            <!-- Machine Learning Model Selection -->
+            <div class="model-section section">
+                <h3><label for="ml_model">Choose a Machine Learning Model</label></h3>
+                <select id="ml_model" class="form-control" name="ml_model">
+                    <option value="" disabled selected>Select a model</option>
+                    <option value="linear_regression">Linear Regression</option>
+                    <option value="decision_tree">Decision Tree</option>
+                    <option value="random_forest">Random Forest</option>
+                    <option value="svm">Support Vector Machine</option>
+                    <option value="neural_network">Neural Network</option>
+                </select>
+                <div class="form-group">
+                    <label for="hyperparamCheckbox">Determine best hyperparameters</label>
+                    <input type="checkbox" id="hyperparamCheckbox" name="hyperparamCheckbox" checked>
+                </div>
+                <div id="hyperparamForm" class="hidden">
+                    <h3>Enter Hyperparameters</h3>
+                    <div id="learning_rate" class="hyperparam-field">
+                        <label for="learning_rate_input">Learning Rate</label>
+                        <input type="text" id="learning_rate_input" class="form-control" name="learning_rate">
+                    </div>
+                    <div id="num_trees" class="hyperparam-field">
+                        <label for="num_trees_input">Number of Trees (for Random Forest)</label>
+                        <input type="text" id="num_trees_input" class="form-control" name="num_trees">
+                    </div>
+                    <div id="max_depth" class="hyperparam-field">
+                        <label for="max_depth_input">Max Depth (for Decision Tree and Random Forest)</label>
+                        <input type="text" id="max_depth_input" class="form-control" name="max_depth">
+                    </div>
+                    <div id="kernel" class="hyperparam-field">
+                        <label for="kernel_input">Kernel (for SVM)</label>
+                        <input type="text" id="kernel_input" class="form-control" name="kernel">
+                    </div>
+                    <div id="c_value" class="hyperparam-field">
+                        <label for="c_value_input">C Value (for SVM)</label>
+                        <input type="text" id="c_value_input" class="form-control" name="c_value">
+                    </div>
+                    <div id="num_layers" class="hyperparam-field">
+                        <label for="num_layers_input">Number of Layers (for Neural Network)</label>
+                        <input type="text" id="num_layers_input" class="form-control" name="num_layers">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technical Indicators Selection -->
+            <div class="form-group section" id="technicalIndicatorsSection">
+                <h3><label for="technical_indicators">Add technical indicator as a feature for the model</label></h3>
+                <select id="technical_indicators" class="form-control" name="technical_indicator_0" onchange="updateAllDropdowns()">
+                    <option value="" disabled selected>Select a technical indicator</option>
+                    <option value="ma">Moving Average</option>
+                    <option value="ema">Exponential Moving Average</option>
+                    <option value="std">Moving Standard Deviation</option>
+                    <option value="macd">MACD</option>
+                    <option value="rsi">RSI</option>
+                    <option value="momentum">Momentum</option>
+                    <option value="plows">Periodic Lows</option>
+                    <option value="phighs">Periodic Highs</option>
+                    <option value="bb">Bollinger Bands</option>
+                </select>
+                <!-- The button will be inserted before the 'Create new bot' button -->
+                <button type="button" id="addDropdownButton" class="subs_btn">Add technical indicator</button>
+            </div>
+
+            <!-- Submit Button -->
+            <div>
+                <button type="submit" class="submit_btn">Create new bot</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

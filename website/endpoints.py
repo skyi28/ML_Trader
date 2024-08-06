@@ -51,6 +51,7 @@ def bot_creation():
         postgres_db.insert_new_model(
             new_id=new_id,
             user=current_user.get_id(),
+            name=request.form.get('name'),
             symbol=request.form.get('crypto_currency'),
             timeframe=int(request.form.get('time_frame')),
             model_type=request.form.get('ml_model'),

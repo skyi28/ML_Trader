@@ -71,7 +71,7 @@ data_thread.start()
 db.create_table('"user"', ['id INT','email VARCHAR','password VARCHAR','first_name VARCHAR','last_name VARCHAR'], primary_keys=['id'])
 
 # Create model table
-db.create_table('models', ['id INT', '"user" INT', 'created TIMESTAMP', 'last_trained TIMESTAMP', 'symbol VARCHAR', 'timeframe INT', 'model_type VARCHAR', 'technical_indicators VARCHAR', 'hyper_parameters JSON', 'pickled BYTEA'])
+db.create_table('models', ['id INT', '"user" INT', 'name VARCHAR', 'created TIMESTAMP', 'last_trained TIMESTAMP', 'symbol VARCHAR', 'timeframe INT', 'model_type VARCHAR', 'technical_indicators VARCHAR', 'hyper_parameters JSON', 'pickled BYTEA'])
 
 logger.info('Start web application')
 app = create_app()

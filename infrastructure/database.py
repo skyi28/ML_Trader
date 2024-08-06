@@ -351,13 +351,14 @@ class Database:
             new_id = 0  # default value if an error occurs
         return new_id
     
-    def insert_new_model(self, new_id: int, user: int, symbol: str, timeframe: int, model_type: str, technical_indicators: str, hyper_parameters: dict) -> None:
+    def insert_new_model(self, new_id: int, user: int, name:str, symbol: str, timeframe: int, model_type: str, technical_indicators: str, hyper_parameters: dict) -> None:
         """
         Inserts a new model into the 'models' table in the PostgreSQL database.
 
         Parameters:
         - user (str): The user who created the model.
         - symbol (str): The symbol of the financial instrument for which the model is created.
+        - name (str): The name of the model.
         - timeframe (int): The timeframe of the financial data used for training the model in minutes.
         - model_type (str): The type of the model (e.g., machine learning algorithm).
         - technical_indicators (str): The technical indicators used in the model.
@@ -366,8 +367,8 @@ class Database:
         Returns:
         - None: The function does not return any value. It inserts a new model into the database.
         """
-        query: str = 'INSERT INTO models (id, "user", created, last_trained, symbol, timeframe, model_type, technical_indicators, hyper_parameters, pickled)'
-        query += f" VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        self.execute_write_query(query, (new_id, user, datetime.datetime.now(), None, symbol, timeframe, model_type, technical_indicators.lower(), hyper_parameters, None))
+        query: str = 'INSERT INTO models (id, "user", name, created, last_trained, symbol, timeframe, model_type, technical_indicators, hyper_parameters, pickled)'
+        query += f" VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        self.execute_write_query(query, (new_id, user, name, datetime.datetime.now(), None, symbol, timeframe, model_type, technical_indicators.lower(), hyper_parameters, None))
         self.commit()
         

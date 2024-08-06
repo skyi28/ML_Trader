@@ -26,9 +26,10 @@ def chart_data() -> dict:
     Returns:
     - dict: A dictionary containing the symbol, dates, and price data. The dates are formatted as '%d.%m.%Y %H:%M:%S'.
     """
+    # TODO Error handling
     symbol: str = request.args.get('symbol')
     entries: int = int(request.args.get('entries'))
-    
+     
     query_result: list = postgres_db.execute_read_query(f"SELECT timestamp,close FROM {symbol.lower()} ORDER BY timestamp DESC LIMIT {entries}")
     dates = [data[0].strftime('%d.%m.%Y %H:%M:%S') for data in query_result]
     dates.reverse()

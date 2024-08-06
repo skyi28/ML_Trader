@@ -15,11 +15,11 @@ postgres:
 webserver:
   host: 127.0.0.1
   port: 5000
-  debug_mode: True
+  debug_mode: False
 
-tradeable_symbols: ["BTCUSD"]
+tradeable_symbols: ["BTCUSD","ETHUSD"]
 
-price_update_interval: 1
+price_update_interval: 15
 
 # TODO Output paths for models
 

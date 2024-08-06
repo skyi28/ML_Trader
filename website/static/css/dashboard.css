@@ -122,6 +122,7 @@ header {
     overflow: hidden; /* Prevent overflow */
     display: flex;
     flex-direction: column; /* Stack children vertically */
+    position: relative; /* Position context for absolute elements */
 }
 
 .table-container {
@@ -162,13 +163,11 @@ th {
 
 .reset-zoom-btn {
     display: block;
-    width: 10%;
     background-color: #4BC0C0; /* Button color */
     color: white;
     border: none;
     padding: 10px;
     cursor: pointer;
-    margin-top: 10px;
     border-radius: 5px;
     font-size: 16px;
     text-align: center;
@@ -176,17 +175,6 @@ th {
 
 .reset-zoom-btn:hover {
     background-color: #36a9a4; /* Darker shade for hover effect */
-}
-
-.main-content {
-    flex: 1; /* Fill available space */
-    background-color: #011627;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    overflow: hidden; /* Prevent overflow */
-    display: flex;
-    flex-direction: column; /* Stack children vertically */
 }
 
 .line-graph-container {
@@ -206,4 +194,22 @@ th {
 
 .rotate-90 {
     transform: rotate(90deg);
+}
+
+.dropdown-container {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    right: 20px; /* Adjust as needed */
+    top: 20px; /* Adjust as needed */
+    gap: 10px; /* Space between label and dropdown */
+}
+
+.crypto-dropdown {
+    background-color: #011627;
+    color: #ffffff;
+    border: 1px solid #4BC0C0; /* Border color to match the theme */
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 16px;
 }

@@ -83,8 +83,9 @@ class BybitData:
                         
                 # Update current price each second
                 if last_update_timestamp + self.config.price_update_interval < time.time():
-                    latest_data = self.get_current_price()
-                    self.insert_latest_data(data=latest_data)
+                    for symbol in self.config.tradeable_symbols:
+                        latest_data = self.get_current_price(symbol=symbol)
+                        self.insert_latest_data(data=latest_data)
                     last_update_timestamp = time.time()
             except Exception as e:
                 self.logger.error(f'Error in data thread: {str(e)}')
@@ -124,7 +125,7 @@ class BybitData:
         Returns
         - (pd.DataFrame) A pandas dataframe containing the historical data
         """
-        params = {"category":"inverse","symbol":"BTCUSD","interval":interval, "limit":limit}
+        params = {"category":"inverse","symbol":symbol,"interval":interval, "limit":limit}
         if start and end:
             start = int(start.timestamp() * 1000)
             end = int(end.timestamp() * 1000)
@@ -167,7 +168,7 @@ class BybitData:
                 while data[-1]["Timestamp"].iloc[-1] < end:
                     next_start = data[-1]["Timestamp"].iloc[-1] + datetime.timedelta(minutes=int(interval))
                     next_end = next_start + datetime.timedelta(minutes=int(interval)*limit)
-                    data.append(self.get_data_helper(next_start, next_end, symbol, interval, limit))
+                    data.append(self.get_data_helper(symbol, next_start, next_end, symbol, interval, limit))
             else:
                 data.append(self.get_data_helper(symbol=symbol, interval=interval, limit=limit))
         except Exception as e:
@@ -269,16 +270,4 @@ class BybitData:
         row = tuple(data) + tuple(data)
         self.db.execute_write_query(query, row)
         self.db.commit()              
-
-# gbd = BybitData()
-# data = gbd.get_historic_data(
-#     # start=datetime.datetime(2024, 7, 23),
-#     # end=datetime.datetime(2024, 7, 25),
-#     symbol="BTCUSD",
-#     interval="1",
-#     limit=1000,
-#     calc_technical_indicators=True
-# )
-# gbd.insert_latest_data(
-#     gbd.get_current_price('BTCUSD')
-# )
+        

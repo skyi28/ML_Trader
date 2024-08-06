@@ -21,8 +21,17 @@
             </ul>
         </div>
         <div class="main-content">
-            <button class="reset-zoom-btn" onclick="reset_zoom()">Reset Zoom</button>
-            <div class="line-graph-container"> <!-- New container for the graph -->
+            <div class="button-container">
+                <button class="reset-zoom-btn" onclick="reset_zoom()">Reset Zoom</button>
+                <div class="dropdown-container">
+                    <label for="crypto_select">Choose Cryptocurrency:</label>
+                    <select id="crypto_select" class="crypto-dropdown" onchange="handleCryptoChange()">
+                        <option value="BTCUSD">BTCUSD</option>
+                        <option value="ETHUSD">ETHUSD</option>
+                    </select>
+                </div>
+            </div>
+            <div class="line-graph-container">
                 <canvas id="lineGraph"></canvas>
             </div>
         </div>
@@ -60,16 +69,13 @@
     <script>
         const ctx = document.getElementById('lineGraph').getContext('2d');
         var lineGraph = fetch_chart_data('{{ symbol }}', '50', ctx);
-        // lineGraph = createLineGraph(
-        //     ctx,
-        //     ['a','b'], // Labels
-        //     [10,20], // Data
-        //     '{{ symbol }}', // Label
-        //     'rgba(75, 192, 192, 1)', // Line color
-        //     'rgba(75, 192, 192, 0.2)', // Fill color
-        //     'Month', // X-axis title
-        //     'Value' // Y-axis title
-        // );
+
+        function handleCryptoChange(){
+            console.log('handleCryptoChange');
+            var symbol = document.getElementById('crypto_select').value;
+            lineGraph.destroy();
+            lineGraph = fetch_chart_data(symbol, '50', ctx);
+        }
 
         function reset_zoom() {
             console.log('reset_zoom');

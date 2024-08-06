@@ -2,6 +2,8 @@ from flask import Blueprint, render_template, redirect, flash, request, url_for,
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
+import json
+
 from website.user import User
 from website.app import db
 from infrastructure.database import Database
@@ -26,7 +28,34 @@ def training():
     if request.method == 'GET':
         return render_template('bot_creation.html')
     if request.method == 'POST':
-        return f"{request.form.to_dict()}"
+        params: dict = request.form.to_dict()
+        
+        technical_indicators: list[str] = [params.get(key) for key in params.keys() if 'technical_indicator' in key]
+        technical_indicators: str = ','.join(technical_indicators)
+        
+        if params.get('hyperparamCheckbox') != 'on':
+            hyper_parameters: dict = {
+                "num_trees" : params.get('num_trees') if params.get('num_trees') else None,
+                "max_depth" : params.get('max_depth') if params.get('max_depth') else None,
+                "learning_rate" : params.get('learning_rate') if params.get('learning_rate') else None,
+                "gamma" : params.get('gamma') if params.get('gamma') else None,
+                "colsample_bytree" : params.get('colsample_bytree') if params.get('colsample_bytree') else None
+            }
+            hyper_parameters = json.dumps(hyper_parameters)
+        else:
+            hyper_parameters = json.dumps({})
+            
+        
+        postgres_db.insert_new_model(
+            user=current_user.get_id(),
+            symbol=request.form.get('crypto_currency'),
+            timeframe=int(request.form.get('time_frame')),
+            model_type=request.form.get('ml_model'),
+            technical_indicators=technical_indicators,
+            hyper_parameters=hyper_parameters
+        )
+        
+        return f"INSERTED NEW MODEL: <br>{request.form.to_dict()}"
 
 @endpoint.route('/dashboard')
 def dashboard():
@@ -134,7 +163,7 @@ def sign_up():
         elif len(password1) < 7:
             flash('Password must be at least 7 characters.', category='error')
         else:
-            new_user_id = postgres_db.provide_uniue_user_id()
+            new_user_id = postgres_db.provide_uniue_id(table='user')
             new_user = User(id=new_user_id, email=email, first_name=first_name, last_name=last_name, password=generate_password_hash(password1))
             db.session.add(new_user)
             db.session.commit()

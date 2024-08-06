@@ -89,6 +89,8 @@ class XGBoostModel:
         model.set_params(**params)
         return model
     
+    # TODO Function to create model from the database
+    
     def train(self, model, features: pd.DataFrame, target: pd.Series):
         # TODO Error handling
         model.fit(features, target)

@@ -25,10 +25,10 @@
                 </select>
                 <select id="time_frame" class="form-control" name="time_frame" required>
                     <option value="" disabled selected>Select a time frame</option>
-                    <option value="1min">1 Minute</option>
-                    <option value="5min">5 Minutes</option>
-                    <option value="15min">15 Minutes</option>
-                    <option value="1hour">1 Hour</option>
+                    <option value="1">1 Minute</option>
+                    <option value="5">5 Minutes</option>
+                    <option value="15">15 Minutes</option>
+                    <option value="60">60 Minutes</option>
                 </select>
             </div>
 
@@ -38,10 +38,7 @@
                 <select id="ml_model" class="form-control" name="ml_model" required>
                     <option value="" disabled selected>Select a model</option>
                     <option value="linear_regression">Linear Regression</option>
-                    <option value="decision_tree">Decision Tree</option>
-                    <option value="random_forest">Random Forest</option>
-                    <option value="svm">Support Vector Machine</option>
-                    <option value="neural_network">Neural Network</option>
+                    <option value="xgboost">XGBoost</option>
                 </select>
                 <div class="form-group">
                     <label for="hyperparamCheckbox">Determine best hyperparameters</label>
@@ -51,27 +48,23 @@
                     <h3>Enter Hyperparameters</h3>
                     <div id="learning_rate" class="hyperparam-field">
                         <label for="learning_rate_input">Learning Rate</label>
-                        <input type="text" id="learning_rate_input" class="form-control" name="learning_rate">
+                        <input type="number" id="learning_rate_input" class="form-control" name="learning_rate" min="0.00000000001" step="any">
                     </div>
                     <div id="num_trees" class="hyperparam-field">
-                        <label for="num_trees_input">Number of Trees (for Random Forest)</label>
-                        <input type="text" id="num_trees_input" class="form-control" name="num_trees">
+                        <label for="num_trees_input">Number of Trees</label>
+                        <input type="number" id="num_trees_input" class="form-control" name="num_trees" min="1" step="1">
                     </div>
                     <div id="max_depth" class="hyperparam-field">
-                        <label for="max_depth_input">Max Depth (for Decision Tree and Random Forest)</label>
-                        <input type="text" id="max_depth_input" class="form-control" name="max_depth">
+                        <label for="max_depth_input">Max Depth</label>
+                        <input type="number" id="max_depth_input" class="form-control" name="max_depth" min="1" step="1">
                     </div>
-                    <div id="kernel" class="hyperparam-field">
-                        <label for="kernel_input">Kernel (for SVM)</label>
-                        <input type="text" id="kernel_input" class="form-control" name="kernel">
+                    <div id="gamma" class="hyperparam-field">
+                        <label for="gamma_input">Gamma</label>
+                        <input type="number" id="gamma_input" class="form-control" name="gamma" min="0.00000000001" step="any">
                     </div>
-                    <div id="c_value" class="hyperparam-field">
-                        <label for="c_value_input">C Value (for SVM)</label>
-                        <input type="text" id="c_value_input" class="form-control" name="c_value">
-                    </div>
-                    <div id="num_layers" class="hyperparam-field">
-                        <label for="num_layers_input">Number of Layers (for Neural Network)</label>
-                        <input type="text" id="num_layers_input" class="form-control" name="num_layers">
+                    <div id="colsample_bytree" class="hyperparam-field">
+                        <label for="colsample_bytree_input">Colsample by Tree</label>
+                        <input type="number" id="colsample_bytree_input" class="form-control" name="colsample_bytree" min="0.00000000001" max="1" step="any">
                     </div>
                 </div>
             </div>

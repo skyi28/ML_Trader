@@ -4,15 +4,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const hyperparamForm = document.getElementById('hyperparamForm');
     const mlModelSelect = document.getElementById('ml_model');
     const hyperparamFields = {
-        linear_regression: ['learning_rate'],
-        decision_tree: ['max_depth'],
-        random_forest: ['num_trees', 'max_depth'],
-        svm: ['kernel', 'c_value'],
-        neural_network: ['learning_rate', 'num_layers']
+        linear_regression: [],
+        xgboost: ['num_trees', 'max_depth', 'learning_rate', 'gamma', 'colsample_bytree'],
     };
 
     const options = ['Moving Average', 'Exponential Moving Average', 'Moving Standard Deviation', 'MACD', 'RSI', 'Momentum', 'Periodic Lows', 'Periodic Highs', 'Bollinger Bands'];
-    let dropdownCount = 1;
+    let dropdownCount = 0;
 
     hyperparamCheckbox.addEventListener('change', function () {
         if (hyperparamCheckbox.checked) {

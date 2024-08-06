@@ -13,10 +13,11 @@
     </header>
     <div class="container">
         <div class="sidebar" id="sidebar">
-            <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
             <ul class="no_border">
-                <li><a href="#"><span class="icon">📊</span><span class="text">Reports</span></a></li>
-                <li><a href="#"><span class="icon">📊</span><span class="text">Reports</span></a></li>
+                <li><span class="icon"><button class="toggle-btn" onclick="toggleSidebar()"><img src="{{ url_for('static', filename='images/icons/sidebar.svg') }}" id="sidebar_dots"></button></span></li>
+                <li><a href="/dashboard"><span class="icon"><img src="{{ url_for('static', filename='images/icons/dashboard.svg') }}"></span><span class="text">Dashboard</span></a></li>
+                <li><a href="/bot_overview"><span class="icon"><img src="{{ url_for('static', filename='images/icons/list.svg') }}"></span><span class="text">My Bots</span></a></li>
+                <li><a href="/bot_creation"><span class="icon"><img src="{{ url_for('static', filename='images/icons/plus.svg') }}"></span><span class="text">Create a Bot</span></a></li>
             </ul>
         </div>
         <div class="main-content">

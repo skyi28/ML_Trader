@@ -146,8 +146,6 @@ th, td {
 }
 
 th {
-    /* background-color: #36a9a4;
-    color: #FFFFFF; */
     text-transform: uppercase;
 }
 
@@ -168,17 +166,6 @@ th, td {
     border: none;
 }
 
-.main-content {
-    flex: 1; /* Fill available space */
-    background-color: #011627;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    overflow: hidden; /* Prevent overflow */
-    display: flex;
-    flex-direction: column; /* Stack children vertically */
-}
-
 .details-button {
     background-color: #36a9a4;
     color: #FFFFFF;
@@ -191,4 +178,12 @@ th, td {
 
 .details-button:hover {
     background-color: #2e8c8a;
+}
+
+#sidebar_dots {
+    transition: transform 0.3s ease-in-out;
+}
+
+.rotate-90 {
+    transform: rotate(90deg);
 }

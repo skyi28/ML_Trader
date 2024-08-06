@@ -199,3 +199,11 @@ th {
     width: 99% !important; /* Full width of its container */
     height: 99% !important; /* Full height of its container */
 }
+
+#sidebar_dots {
+    transition: transform 0.3s ease-in-out;
+}
+
+.rotate-90 {
+    transform: rotate(90deg);
+}

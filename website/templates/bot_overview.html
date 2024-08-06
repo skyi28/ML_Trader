@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Model Details</title>
+    <title>My Models</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bot_overview.css') }}">
 </head>
 <body>
     <header>
-        <h1>Model Details Overview</h1>
+        <h1>My Models</h1>
     </header>
     <div class="container">
         <div class="sidebar" id="sidebar">
@@ -17,6 +18,7 @@
                 <li><a href="/dashboard"><span class="icon"><img src="{{ url_for('static', filename='images/icons/dashboard.svg') }}"></span><span class="text">Dashboard</span></a></li>
                 <li><a href="/bot_overview"><span class="icon"><img src="{{ url_for('static', filename='images/icons/list.svg') }}"></span><span class="text">My Bots</span></a></li>
                 <li><a href="/bot_creation"><span class="icon"><img src="{{ url_for('static', filename='images/icons/plus.svg') }}"></span><span class="text">Create a Bot</span></a></li>
+                <li><a href=""><span class="icon"><img src="{{ url_for('static', filename='images/icons/profile.svg') }}"></span><span class="text">Profile</span></a></li>
             </ul>
         </div>
         <div class="main-content">

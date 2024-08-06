@@ -15,7 +15,7 @@ postgres:
 webserver:
   host: 127.0.0.1
   port: 5000
-  debug_mode: False
+  debug_mode: True
 
 tradeable_symbols: ["BTCUSD","ETHUSD"]
 

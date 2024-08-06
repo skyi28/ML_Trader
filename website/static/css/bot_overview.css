@@ -149,10 +149,10 @@ th {
     text-transform: uppercase;
 }
 
-td {
+/* td {
     background-color: #ffffff;
     color: #011627;
-}
+} */
 
 th, td {
     border: 1px solid #ddd;

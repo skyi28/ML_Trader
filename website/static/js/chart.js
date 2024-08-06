@@ -17,8 +17,8 @@ function fetch_chart_data(symbol, entries, ctx) {
                 response['symbol'], // Label # TODO Symbol needs to be passed by API as well
                 'rgba(75, 192, 192, 1)', // Line color
                 'rgba(75, 192, 192, 0.2)', // Fill color
-                'Month', // X-axis title
-                'Value' // Y-axis title
+                'Time', // X-axis title
+                'Price in USD' // Y-axis title
             );
             return lineGraph;
         },

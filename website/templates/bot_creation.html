@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Drop-down Menu</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bot_creation.css') }}">
     <script src="{{ url_for('static', filename='js/bot_creation.js') }}"></script>
 </head>
 <body>
     <header>
-        <h1>HEADER</h1>
+        <h1>Create a new Model</h1>
     </header>
     <div class="container">
         <div>
@@ -26,10 +27,8 @@
                 <h3><label for="crypto_currency">Choose a Cryptocurrency and Time Frame</label></h3>
                 <select id="crypto_currency" class="form-control" name="crypto_currency" required>
                     <option value="" disabled selected>Select a cryptocurrency</option>
-                    <option value="bitcoin">Bitcoin</option>
-                    <option value="ethereum">Ethereum</option>
-                    <option value="litecoin">Litecoin</option>
-                    <option value="ripple">Ripple</option>
+                    <option value="BTCUSD">BTCUSD</option>
+                    <option value="ETHUSD">ETHUSD</option>
                 </select>
                 <select id="time_frame" class="form-control" name="time_frame" required>
                     <option value="" disabled selected>Select a time frame</option>

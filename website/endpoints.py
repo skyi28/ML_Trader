@@ -24,10 +24,18 @@ def favicon():
 def index():
     return f'Hello World'
 
+@login_required
+@endpoint.route('/bot_overview', methods=['GET', 'POST'])
+def bot_overview():
+    if request.method == 'GET':
+        models = postgres_db.get_all_models_by_user(current_user.get_id())
+        return render_template('bot_overview.html', user=current_user, models=models)
+
+@login_required
 @endpoint.route('/bot_creation', methods=['GET', 'POST'])
 def bot_creation():
     if request.method == 'GET':
-        return render_template('bot_creation.html')
+        return render_template('bot_creation.html', user=current_user)
     if request.method == 'POST':
         params: dict = request.form.to_dict()
         

@@ -372,3 +372,8 @@ class Database:
         self.execute_write_query(query, (new_id, user, name, datetime.datetime.now(), None, symbol, timeframe, model_type, technical_indicators.lower(), hyper_parameters, None))
         self.commit()
         
+    def get_all_models_by_user(self, user_id: int):
+        query: str = f'SELECT * FROM models WHERE "user"={user_id} ORDER BY created DESC'
+        data = self.execute_read_query(query)
+        return data
+        

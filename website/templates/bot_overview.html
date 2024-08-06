@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Details</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bot_overview.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Model Details Overview</h1>
+    </header>
+    <div class="container">
+        <div class="sidebar" id="sidebar">
+            <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+            <ul class="no_border">
+                <li><a href="#"><span class="icon">📊</span><span class="text">Reports</span></a></li>
+                <li><a href="#"><span class="icon">📊</span><span class="text">Reports</span></a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Creation Date</th>
+                        <th>Name</th>
+                        <th>Traded Symbol</th>
+                        <th>Model Type</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for model in models %}
+                    <tr>
+                        <td>{{ model[3] }}</td>
+                        <td>{{ model[2] }}</td>
+                        <td>{{ model[5] }}</td>
+                        <td>{{ model[7] }}</td>
+                        <td><button class="details-button">Details</button></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

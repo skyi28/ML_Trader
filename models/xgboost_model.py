@@ -14,11 +14,12 @@ for part in basedir_split:
 
 import pandas as pd
 import xgboost as xgb
+from models.model_base import ModelBase
 from config.config import load_config
 from infrastructure.database import Database
 from infrastructure.logger import create_logger
 
-class XGBoostModel:
+class XGBoostModel(ModelBase):
     def __init__(self, id: int) -> None:
         """
         Initialize the XGBoostModel class with the provided id.
@@ -32,6 +33,7 @@ class XGBoostModel:
         self.db = Database()
         self.config = load_config(f'{path_to_config}{os.sep}config.yaml')
         self.logger = create_logger('xgboost.log')
+        super().__init__(self.db, self.config)
         
     def get_default_params(self, mode: str = 'direction') -> dict:
         """

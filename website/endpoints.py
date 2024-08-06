@@ -3,11 +3,12 @@ from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
 import json
+import threading
 
 from website.user import User
 from website.app import db
 from infrastructure.database import Database
-
+from models.xgboost_model import XGBoostModel
 
 endpoint = Blueprint('endpoints', __name__)
 
@@ -24,7 +25,7 @@ def index():
     return f'Hello World'
 
 @endpoint.route('/bot_creation', methods=['GET', 'POST'])
-def training():
+def bot_creation():
     if request.method == 'GET':
         return render_template('bot_creation.html')
     if request.method == 'POST':
@@ -45,8 +46,10 @@ def training():
         else:
             hyper_parameters = json.dumps({})
             
+        new_id = postgres_db.provide_uniue_id('models')
         
         postgres_db.insert_new_model(
+            new_id=new_id,
             user=current_user.get_id(),
             symbol=request.form.get('crypto_currency'),
             timeframe=int(request.form.get('time_frame')),

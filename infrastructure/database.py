@@ -351,7 +351,7 @@ class Database:
             new_id = 0  # default value if an error occurs
         return new_id
     
-    def insert_new_model(self, user: int, symbol: str, timeframe: int, model_type: str, technical_indicators: str, hyper_parameters: dict) -> None:
+    def insert_new_model(self, new_id: int, user: int, symbol: str, timeframe: int, model_type: str, technical_indicators: str, hyper_parameters: dict) -> None:
         """
         Inserts a new model into the 'models' table in the PostgreSQL database.
 
@@ -366,8 +366,6 @@ class Database:
         Returns:
         - None: The function does not return any value. It inserts a new model into the database.
         """
-        new_id = self.provide_uniue_id('models')
-
         query: str = 'INSERT INTO models (id, "user", created, last_trained, symbol, timeframe, model_type, technical_indicators, hyper_parameters, pickled)'
         query += f" VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         self.execute_write_query(query, (new_id, user, datetime.datetime.now(), None, symbol, timeframe, model_type, technical_indicators.lower(), hyper_parameters, None))

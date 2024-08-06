@@ -1,32 +1,27 @@
 body {
+    font-family: Arial, sans-serif;
+    background-color: #011627;
+    color: white;
+    margin: 0;
     display: flex;
     flex-direction: column;
-    height: 100vh; /* Full viewport height */
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #00090f;
-    color: #ffffff;
-    overflow: hidden; /* Prevent scrollbars */
+    min-height: 100vh; /* Ensure the body takes up full height */
 }
 
 header {
-    width: 100%;
     background-color: #011627;
-    color: #ffffff;
-    padding: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    color: #fff;
+    padding: 10px 0;
+    width: 100%;
     text-align: center;
-    position: relative;
-    z-index: 1000; /* Ensure header is above other elements */
-    flex-shrink: 0; /* Prevent header from shrinking */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.container {
+.main-content {
     display: flex;
     flex: 1; /* Fill available space */
     margin: 10px; /* Space around container */
-    gap: 10px; /* Gap between flex items */
-    overflow: hidden; /* Prevent overflow */
+    gap: 10px; /* Gap between sidebar and container */
 }
 
 .sidebar {
@@ -49,6 +44,7 @@ header {
 .sidebar h2 {
     margin: 0;
     font-size: 20px;
+    color: white;
 }
 
 .sidebar.collapsed h2 {
@@ -113,30 +109,45 @@ header {
     font-size: 24px;
 }
 
-.main-content {
-    flex: 1; /* Fill available space */
-    background-color: #011627;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    overflow: hidden; /* Prevent overflow */
+.container {
     display: flex;
-    flex-direction: column; /* Stack children vertically */
+    flex-direction: column; /* Stack items vertically */
+    flex: 1; /* Fill available space */
+    margin: 10px;
+    gap: 10px; /* Gap between sections */
+    overflow: hidden; /* Prevent overflow */
 }
 
-.table-container {
-    flex: 0.5; /* Adjust this to your preference */
-    overflow-y: auto; /* Allow scrolling if needed */
+.graph-section, .trades-section, .buttons-section {
     background-color: #011627;
     border-radius: 10px;
     padding: 20px;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.graph-section {
+    height: 90%; /* Adjust height as needed */
+    width: 100%; /* Full width */
+}
+
+.trades-section {
+    height: 300px; /* Height for the trades section */
+    overflow-y: auto; /* Allow scrolling if content overflows */
+}
+
+.buttons-section {
+    display: flex;
+    justify-content: space-between;
+}
+
+h2 {
+    color: #fff;
+    margin-bottom: 10px;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed; /* Makes columns fixed-width */
 }
 
 table, th, td {
@@ -154,26 +165,19 @@ th {
     text-transform: uppercase;
 }
 
-.no_border {
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #011627;
+    background-color: #4BC0C0;
     border: none;
-}
-
-.no_border th, .no_border td {
-    border: none;
-}
-
-.details-button {
-    background-color: #36a9a4;
-    color: #FFFFFF;
-    border: none;
-    padding: 8px 12px;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 14px;
+    transition: background-color 0.3s;
 }
 
-.details-button:hover {
-    background-color: #2e8c8a;
+button:hover {
+    background-color: #36a9a4;
 }
 
 #sidebar_dots {

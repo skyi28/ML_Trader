@@ -25,6 +25,11 @@ def index():
     return f'Hello World'
 
 @login_required
+@endpoint.route('/bot')
+def bot():
+    return render_template('bot.html')
+
+@login_required
 @endpoint.route('/bot_overview', methods=['GET', 'POST'])
 def bot_overview():
     if request.method == 'GET':

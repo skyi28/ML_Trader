@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Bot Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bot.css') }}">
+    <script src="{{ url_for('static', filename='js/bot.js') }}"></script>
+</head>
+<body>
+    <header>
+        <h1>Trading Bot Dashboard</h1>
+    </header>
+    <div class="main-content">
+        <div class="sidebar" id="sidebar">
+            <ul class="no_border">
+                <li><span class="icon"><button class="toggle-btn" onclick="toggleSidebar()"><img src="{{ url_for('static', filename='images/icons/sidebar.svg') }}" id="sidebar_dots"></button></span></li>
+                <li><a href="/dashboard"><span class="icon"><img src="{{ url_for('static', filename='images/icons/dashboard.svg') }}"></span><span class="text">Dashboard</span></a></li>
+                <li><a href="/bot_overview"><span class="icon"><img src="{{ url_for('static', filename='images/icons/list.svg') }}"></span><span class="text">My Bots</span></a></li>
+                <li><a href="/bot_creation"><span class="icon"><img src="{{ url_for('static', filename='images/icons/plus.svg') }}"></span><span class="text">Create a Bot</span></a></li>
+                <li><a href=""><span class="icon"><img src="{{ url_for('static', filename='images/icons/profile.svg') }}"></span><span class="text">Profile</span></a></li>
+            </ul>
+        </div>
+        <div class="container">
+            <div class="graph-section">
+                <h2>Price Development</h2>
+                <canvas id="priceGraph"></canvas>
+            </div>
+            <div class="buttons-section">
+                <button id="startStopBot" onclick="toggleBot()">Start Bot</button>
+                <button id="retrainModel" onclick="retrainModel()">Retrain Model</button>
+            </div>
+            <div class="trades-section">
+                <h2>Last Trades</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Example rows, replace with dynamic content -->
+                        <tr>
+                            <td>12:01</td>
+                            <td>Buy</td>
+                            <td>0.5 BTC</td>
+                            <td>$34,000</td>
+                        </tr>
+                        <tr>
+                            <td>12:15</td>
+                            <td>Sell</td>
+                            <td>0.3 BTC</td>
+                            <td>$34,500</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('priceGraph').getContext('2d');
+
+        const data = [32000, 34000, 36000, 38000, 37000, 39000, 40000];
+        const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
+
+        const longPositions = [1, 4]; // Indices of long positions
+        const shortPositions = [2, 5]; // Indices of short positions
+
+        const positionInfo = new Array(data.length).fill('');
+        longPositions.forEach(index => positionInfo[index] = 'Long Position');
+        shortPositions.forEach(index => positionInfo[index] = 'Short Position');
+
+        const priceGraph = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'BTC Price',
+                    data: data,
+                    borderColor: '#4BC0C0',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true,
+                    pointRadius: data.map((_, index) => {
+                        if (longPositions.includes(index) || shortPositions.includes(index)) {
+                            return 5;
+                        }
+                        return 0;
+                    }),
+                    pointBackgroundColor: data.map((_, index) => {
+                        if (longPositions.includes(index)) {
+                            return '#00FF00'; // Green for long positions
+                        } else if (shortPositions.includes(index)) {
+                            return '#FF0000'; // Red for short positions
+                        }
+                        return 'transparent';
+                    }),
+                    pointStyle: 'circle',
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Month',
+                            color: 'white' // Set X-axis title color to white
+                        },
+                        ticks: {
+                            color: 'white' // Set X-axis labels color to white
+                        }
+                    },
+                    y: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Price in USD',
+                            color: 'white' // Set Y-axis title color to white
+                        },
+                        ticks: {
+                            color: 'white' // Set Y-axis labels color to white
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.dataset.label || '';
+                                const value = context.raw;
+                                const position = positionInfo[context.dataIndex];
+                                return `${label}: $${value} (${position})`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        function toggleBot() {
+            const button = document.getElementById('startStopBot');
+            if (button.textContent === 'Start Bot') {
+                button.textContent = 'Stop Bot';
+                button.style.backgroundColor = '#DC3545'; // Red for stop
+            } else {
+                button.textContent = 'Start Bot';
+                button.style.backgroundColor = '#4BC0C0'; // Original color for start
+            }
+        }
+
+        function retrainModel() {
+            alert('Retraining the model...');
+        }
+    </script>
+</body>
+</html>

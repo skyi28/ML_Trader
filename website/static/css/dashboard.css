@@ -213,3 +213,12 @@ th {
     padding: 5px;
     font-size: 16px;
 }
+
+.timeframe-dropdown {
+    background-color: #011627;
+    color: #ffffff;
+    border: 1px solid #4BC0C0; /* Border color to match the theme */
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 16px;
+}

@@ -1,5 +1,4 @@
 function fetch_chart_data(symbol, entries, ctx) {
-    console.log('Fetching chart data');
     $.ajax({
         url: '/api/chart_data',
         type: 'GET',
@@ -9,7 +8,6 @@ function fetch_chart_data(symbol, entries, ctx) {
         },
         success: function(response) {
             response = $.parseJSON(response)
-            console.log('Received chart data:', response['chart_data']);
             lineGraph = createLineGraph(
                 ctx,
                 response['dates'], // Labels
@@ -29,8 +27,6 @@ function fetch_chart_data(symbol, entries, ctx) {
 }
 
 function createLineGraph(ctx, labels, data, label, borderColor, backgroundColor, xAxisTitle, yAxisTitle) {
-    console.log('CREATING CHART')
-    console.log(data)
     return new Chart(ctx, {
       type: 'line',
       data: {

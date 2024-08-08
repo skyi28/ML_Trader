@@ -25,10 +25,16 @@
             <div class="button-container">
                 <button class="reset-zoom-btn" onclick="reset_zoom()">Reset Zoom</button>
                 <div class="dropdown-container">
-                    <label for="crypto_select">Choose Cryptocurrency:</label>
+                    <label for="crypto_select">Symbol:</label>
                     <select id="crypto_select" class="crypto-dropdown" onchange="handleCryptoChange()">
                         <option value="BTCUSD">BTCUSD</option>
                         <option value="ETHUSD">ETHUSD</option>
+                    </select>
+                    <label for="timeframe_select">Timeframe:</label>
+                    <select id="timeframe_select" class="timeframe-dropdown" onchange="handleCryptoChange()">
+                        <option value="60">1h</option>
+                        <option value="180">3h</option>
+                        <option value="720">12h</option>
                     </select>
                 </div>
             </div>
@@ -68,18 +74,18 @@
     <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 
     <script>
+        var shown_datapoints = document.getElementById('timeframe_select').value;
         const ctx = document.getElementById('lineGraph').getContext('2d');
-        var lineGraph = fetch_chart_data('{{ symbol }}', '50', ctx);
+        var lineGraph = fetch_chart_data('{{ symbol }}', shown_datapoints, ctx);
 
         function handleCryptoChange(){
-            console.log('handleCryptoChange');
+            var shown_datapoints = document.getElementById('timeframe_select').value;
             var symbol = document.getElementById('crypto_select').value;
             lineGraph.destroy();
-            lineGraph = fetch_chart_data(symbol, '50', ctx);
+            lineGraph = fetch_chart_data(symbol, shown_datapoints, ctx);
         }
 
         function reset_zoom() {
-            console.log('reset_zoom');
             lineGraph.resetZoom();
         }
     </script>

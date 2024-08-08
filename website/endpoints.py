@@ -25,6 +25,17 @@ def index():
     return f'Hello World'
 
 @login_required
+@endpoint.route('/train/<int:bot_id>', methods=['GET', 'POST'])
+def bot_train(bot_id: int):
+    if request.method == 'GET':
+        bot = postgres_db.get_bot_by_id(bot_id)
+        indicators = bot[8].split(',')
+        return render_template('bot_train.html', user=current_user, bot=bot, indicators=indicators)
+    elif request.method == 'POST':
+        # TODO Write a function which acutally trains the model after all user inputs
+        pass
+
+@login_required
 @endpoint.route('/bot/<int:bot_id>')
 def bot(bot_id: int):
     bot = postgres_db.get_bot_by_id(bot_id)
@@ -32,7 +43,7 @@ def bot(bot_id: int):
 
 @login_required
 @endpoint.route('/delete_bot/<int:bot_id>')
-def delete_bot(bot_id: int):
+def bot_delete(bot_id: int):
     # TODO Check if bot is running before deleting
     postgres_db.delete_bot_by_id(bot_id)
     return redirect('/bot_overview')

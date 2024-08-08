@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Training</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bot_train.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Model Training</h1>
+        <b>Model Type: {{ bot[7] }}</b>
+        <br>
+        <br>
+        <b>Used technical indicators:</b>
+        <br>
+        <ul>
+            {% for indicator in indicators %}
+            <li>{{ indicator }}</li>
+            {% endfor %}
+        </ul>
+        <br>
+        <form id="trainingForm">
+            <div class="form-group">
+                <label for="startTime">Start Time:</label>
+                <input type="datetime-local" id="startTime" name="startTime" class="input-field">
+            </div>
+            <div class="form-group">
+                <label for="endTime">End Time:</label>
+                <input type="datetime-local" id="endTime" name="endTime" class="input-field">
+            </div>
+            <div class="form-group">
+                <label for="dataPercentage">Data Percentage for Training:</label>
+                <input type="number" id="dataPercentage" name="dataPercentage" min="0" max="100" class="input-field">
+            </div>
+            <div class="form-group">
+                <input type="checkbox" id="useAllData" name="useAllData">
+                <label for="useAllData">Use all data for training</label>
+            </div>
+            {% if bot[7] in ["lstm", "cnn"] %}
+            <div class="form-group">
+                <label for="batchSize">Batch Size:</label>
+                <input type="number" id="batchSize" name="batchSize" min="1" class="input-field">
+            </div>
+            <div class="form-group">
+                <label for="epochs">Number of Epochs:</label>
+                <input type="number" id="epochs" name="epochs" min="1" class="input-field">
+            </div>
+            {% endif %}
+            <button type="submit">Train</button>
+        </form>
+    </div>
+    <script src="{{ url_for('static', filename='js/bot_train.js') }}"></script>
+</body>
+</html>

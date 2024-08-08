@@ -154,6 +154,11 @@ th {
     text-transform: uppercase;
 }
 
+a {
+    color: #011627;
+    text-decoration: none;
+}
+
 .no_border {
     border: none;
 }

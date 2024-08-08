@@ -22,6 +22,7 @@ for part in basedir_split:
 sys.path.append(path_to_config)
 
 import threading
+import subprocess
 
 from config.config import load_config
 from infrastructure.database import Database
@@ -36,6 +37,11 @@ logger.info(f'Loading config.yaml from {path_to_config}{os.sep}config{os.sep}con
 config = load_config(f'{path_to_config}{os.sep}config{os.sep}config.yaml')
 
 # TODO Execute cmd commands to start the database
+change_dir_command: str = f'cd {config.postgres.path_to_postgres}{os.sep}bin'
+start_postgres_command: str = f'.{os.sep}pg_ctl.exe start -D "A:{os.sep}PostgreSQL{os.sep}16{os.sep}data"'
+logger.info(f'Starting postgres...')
+result = subprocess.run(['powershell', '-Command',f'{change_dir_command}; {start_postgres_command}'])
+logger.info(f'Output: {result.stdout} \nError: {result.stderr}')
 
 logger.info('Establishing connection to database')
 db = Database()

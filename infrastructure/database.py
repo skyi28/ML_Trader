@@ -373,12 +373,45 @@ class Database:
         self.commit()
         
     def get_all_bots_by_user(self, user_id: int):
+        """
+        Retrieves all bots created by a specific user from the 'bots' table in the PostgreSQL database.
+
+        Parameters:
+        - user_id (int): The unique identifier of the user who created the bots.
+
+        Returns:
+        - list: A list of tuples, where each tuple represents a row in the 'bots' table. Each tuple contains the bot's details.
+        """
         query: str = f'SELECT * FROM bots WHERE "user"={user_id} ORDER BY created DESC'
         data = self.execute_read_query(query)
         return data
     
     def get_bot_by_id(self, bot_id: int) -> list | None:
+        """
+        Retrieves a bot from the 'bots' table in the PostgreSQL database based on its unique identifier.
+
+        Parameters:
+        - bot_id (int): The unique identifier of the bot to be retrieved.
+
+        Returns:
+        - list | None: A list containing the details of the bot if it exists in the database. If the bot does not exist,
+        it returns None.
+        """
         query: str = f'SELECT * FROM bots WHERE id={bot_id}'
         data = self.execute_read_query(query)
         return data[0] if data else None
+    
+    def delete_bot_by_id(self, bot_id: int) -> None:
+        """
+        Deletes a bot from the 'bots' table in the PostgreSQL database based on its unique identifier.
+
+        Parameters:
+        - bot_id (int): The unique identifier of the bot to be deleted.
+
+        Returns:
+        - None: The function does not return any value. It deletes the bot from the database.
+        """
+        query: str = f'DELETE FROM bots WHERE id={bot_id}'
+        self.execute_write_query(query)
+        self.commit()
         

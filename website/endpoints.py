@@ -31,6 +31,13 @@ def bot(bot_id: int):
     return render_template('bot.html', user=current_user, bot=bot)
 
 @login_required
+@endpoint.route('/delete_bot/<int:bot_id>')
+def delete_bot(bot_id: int):
+    # TODO Check if bot is running before deleting
+    postgres_db.delete_bot_by_id(bot_id)
+    return redirect('/bot_overview')
+
+@login_required
 @endpoint.route('/bot_overview', methods=['GET', 'POST'])
 def bot_overview():
     if request.method == 'GET':

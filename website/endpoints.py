@@ -25,16 +25,17 @@ def index():
     return f'Hello World'
 
 @login_required
-@endpoint.route('/bot')
-def bot():
-    return render_template('bot.html')
+@endpoint.route('/bot/<int:bot_id>')
+def bot(bot_id: int):
+    bot = postgres_db.get_bot_by_id(bot_id)
+    return render_template('bot.html', user=current_user, bot=bot)
 
 @login_required
 @endpoint.route('/bot_overview', methods=['GET', 'POST'])
 def bot_overview():
     if request.method == 'GET':
-        models = postgres_db.get_all_models_by_user(current_user.get_id())
-        return render_template('bot_overview.html', user=current_user, models=models)
+        bots = postgres_db.get_all_bots_by_user(current_user.get_id())
+        return render_template('bot_overview.html', user=current_user, bots=bots)
 
 @login_required
 @endpoint.route('/bot_creation', methods=['GET', 'POST'])
@@ -59,9 +60,9 @@ def bot_creation():
         else:
             hyper_parameters = json.dumps({})
             
-        new_id = postgres_db.provide_uniue_id('models')
+        new_id = postgres_db.provide_uniue_id('bots')
         
-        postgres_db.insert_new_model(
+        postgres_db.insert_new_bot(
             new_id=new_id,
             user=current_user.get_id(),
             name=request.form.get('name'),
@@ -72,7 +73,7 @@ def bot_creation():
             hyper_parameters=hyper_parameters
         )
         
-        return f"INSERTED NEW MODEL: <br>{request.form.to_dict()}"
+        return redirect('/bot_overview')
 
 @endpoint.route('/dashboard')
 def dashboard():

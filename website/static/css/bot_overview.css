@@ -176,6 +176,17 @@ th {
     background-color: #2e8c8a;
 }
 
+.delete_btn {
+    background-color: #DC3545;
+    color: #FFF;
+    border: none;
+    margin-left: 10px;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
 #sidebar_dots {
     transition: transform 0.3s ease-in-out;
 }

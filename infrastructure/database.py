@@ -351,29 +351,34 @@ class Database:
             new_id = 0  # default value if an error occurs
         return new_id
     
-    def insert_new_model(self, new_id: int, user: int, name:str, symbol: str, timeframe: int, model_type: str, technical_indicators: str, hyper_parameters: dict) -> None:
+    def insert_new_bot(self, new_id: int, user: int, name:str, symbol: str, timeframe: int, model_type: str, technical_indicators: str, hyper_parameters: dict) -> None:
         """
-        Inserts a new model into the 'models' table in the PostgreSQL database.
+        Inserts a new bot into the 'bots' table in the PostgreSQL database.
 
         Parameters:
-        - user (str): The user who created the model.
-        - symbol (str): The symbol of the financial instrument for which the model is created.
-        - name (str): The name of the model.
-        - timeframe (int): The timeframe of the financial data used for training the model in minutes.
-        - model_type (str): The type of the model (e.g., machine learning algorithm).
-        - technical_indicators (str): The technical indicators used in the model.
-        - hyper_parameters (json): The hyperparameters of the model.
+        - user (str): The user who created the bot.
+        - symbol (str): The symbol of the financial instrument for which the bot is created.
+        - name (str): The name of the bot.
+        - timeframe (int): The timeframe of the financial data used for training the bot in minutes.
+        - model_type (str): The type of the bot (e.g., machine learning algorithm).
+        - technical_indicators (str): The technical indicators used in the bot.
+        - hyper_parameters (json): The hyperparameters of the bot.
 
         Returns:
-        - None: The function does not return any value. It inserts a new model into the database.
+        - None: The function does not return any value. It inserts a new bot into the database.
         """
-        query: str = 'INSERT INTO models (id, "user", name, created, last_trained, symbol, timeframe, model_type, technical_indicators, hyper_parameters, pickled)'
+        query: str = 'INSERT INTO bots (id, "user", name, created, last_trained, symbol, timeframe, model_type, technical_indicators, hyper_parameters, pickled)'
         query += f" VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         self.execute_write_query(query, (new_id, user, name, datetime.datetime.now(), None, symbol, timeframe, model_type, technical_indicators.lower(), hyper_parameters, None))
         self.commit()
         
-    def get_all_models_by_user(self, user_id: int):
-        query: str = f'SELECT * FROM models WHERE "user"={user_id} ORDER BY created DESC'
+    def get_all_bots_by_user(self, user_id: int):
+        query: str = f'SELECT * FROM bots WHERE "user"={user_id} ORDER BY created DESC'
         data = self.execute_read_query(query)
         return data
+    
+    def get_bot_by_id(self, bot_id: int) -> list | None:
+        query: str = f'SELECT * FROM bots WHERE id={bot_id}'
+        data = self.execute_read_query(query)
+        return data[0] if data else None
         

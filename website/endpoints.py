@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 import json
 import threading
+import datetime
 
 from website.user import User
 from website.app import db
@@ -27,13 +28,28 @@ def index():
 @login_required
 @endpoint.route('/train/<int:bot_id>', methods=['GET', 'POST'])
 def bot_train(bot_id: int):
+    bot = postgres_db.get_bot_by_id(bot_id)
     if request.method == 'GET':
-        bot = postgres_db.get_bot_by_id(bot_id)
         indicators = bot[8].split(',')
         return render_template('bot_train.html', user=current_user, bot=bot, indicators=indicators)
     elif request.method == 'POST':
         # TODO Write a function which acutally trains the model after all user inputs
-        pass
+        params: dict = request.form.to_dict()
+        start_time: datetime.datetime = datetime.datetime.strptime(params['startTime'], '%Y-%m-%dT%H:%M')
+        end_time: datetime.datetime = datetime.datetime.strptime(params['endTime'], '%Y-%m-%dT%H:%M')
+        if 'useAllData' in params.keys():
+            data_percentage = 1
+        else:
+            data_percentage = float(params['dataPercentage']) / 100
+            
+        # TODO get model specific data such us batch size and epochs from the request
+            
+        if bot[7].lower() == 'xgboost':
+            # TODO call the train function of xgboost and save the trained model in the database
+            pass
+            
+        return f'{params}'
+
 
 @login_required
 @endpoint.route('/bot/<int:bot_id>')

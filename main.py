@@ -38,7 +38,7 @@ config = load_config(f'{path_to_config}{os.sep}config{os.sep}config.yaml')
 
 # TODO Execute cmd commands to start the database
 change_dir_command: str = f'cd {config.postgres.path_to_postgres}{os.sep}bin'
-start_postgres_command: str = f'.{os.sep}pg_ctl.exe start -D "A:{os.sep}PostgreSQL{os.sep}16{os.sep}data"'
+start_postgres_command: str = f'.{os.sep}pg_ctl.exe start -D "A:{os.sep}PostgreSQL{os.sep}16{os.sep}data"' # Replace this with path_to_postgres
 logger.info(f'Starting postgres...')
 result = subprocess.run(['powershell', '-Command',f'{change_dir_command}; {start_postgres_command}'])
 logger.info(f'Output: {result.stdout} \nError: {result.stderr}')

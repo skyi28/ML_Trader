@@ -9,15 +9,20 @@ path_to_config = ''
 for part in basedir_split:
     path_to_config += part + os.sep
     if part == "ML_Trader":
-        path_to_config += f'\config'
+        path_to_config += f'{os.sep}config'
         break
 
 import pandas as pd
+import datetime
 import xgboost as xgb
-from models.model_base import ModelBase
+
 from config.config import load_config
-from infrastructure.database import Database
+
 from infrastructure.logger import create_logger
+from infrastructure.database import Database
+
+from models.model_base import ModelBase
+from models.prepare_training_data import PrepareTrainingData
 
 class XGBoostModel(ModelBase):
     def __init__(self, id: int) -> None:
@@ -33,6 +38,7 @@ class XGBoostModel(ModelBase):
         self.db = Database()
         self.config = load_config(f'{path_to_config}{os.sep}config.yaml')
         self.logger = create_logger('xgboost.log')
+        self.ptd = PrepareTrainingData()
         super().__init__(self.db, self.config)
         
     def get_default_params(self, mode: str = 'direction') -> dict:
@@ -93,7 +99,33 @@ class XGBoostModel(ModelBase):
     
     # TODO Function to create model from the database
     
-    def train(self, model, features: pd.DataFrame, target: pd.Series):
+    def train(self, user: int, model_id: int, model: xgb.XGBClassifier, start_date: datetime.datetime, end_date: datetime.datetime, train_size: float) -> None: # TODO pass model as parameter to be trained
+        """
+        Trains the XGBoost model using data from the specified symbol and technical indicators within the given date range.
+
+        Parameters:
+        - user (int): The unique identifier of the user for whom the model is being trained.
+        - model_id (int): The unique identifier of the model instance.
+        - model (xgb.XGBClassifier): The model instance which should be trained.
+        - start_date (datetime.datetime): The start date of the data range for training.
+        - end_date (datetime.datetime): The end date of the data range for training.
+        - train_size (float): The proportion of the data to be used for training (between 0 and 1).
+
+        Returns:
+        - None: The function does not return anything. It trains the XGBoost model using the specified data.
+        """
+        symbol: str = self.get_symbol_from_database(user, model_id)
+        technical_indicators: list[str] = self.get_technical_indicators_from_database(user, model_id)
+        
+        # data pipeline
+        data = self.ptd.load_data(symbol, feature_columns=technical_indicators, min_date=start_date, max_date=end_date)
+        data = data.pipe(self.ptd.remove_na).pipe(self.ptd.remove_timestamp).pipe(self.ptd.add_return).pipe(self.ptd.add_direction, remove_zeros=True)
+        features, target = self.ptd.create_features_and_targets(data)        
+                
+        model.fit(features, target)
+        return model
+    
+    def train_old(self, model, features: pd.DataFrame, target: pd.Series):
         # TODO Error handling
         model.fit(features, target)
         return model

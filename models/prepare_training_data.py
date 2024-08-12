@@ -55,12 +55,20 @@ class PrepareTrainingData:
         if not feature_columns:
             query: str = f"SELECT * FROM {symbol}"
         else:
+            if 'open' not in feature_columns:
+                feature_columns.insert(0, 'open')
+            if 'close' not in feature_columns:
+                feature_columns.insert(1,'close')
             query: str = f"SELECT {','.join(feature_columns)} FROM {symbol}"
             
         if min_date:
-            query += f" WHERE timestamp >= '{min_date}'"
+            query += f" WHERE TO_TIMESTAMP('{min_date}', 'YYYY-MM-DD HH24:MI') <= timestamp"
         if max_date:
-            query += f" AND timestamp <= '{max_date}'"
+            if min_date:
+                query += " AND"
+            else:
+                query += " WHERE"
+            query += f" TO_TIMESTAMP('{max_date}', 'YYYY-MM-DD HH24:MI') >= timestamp"
             
         return self.db.execute_read_query(query, return_type='pd.DataFrame')
     
@@ -94,7 +102,10 @@ class PrepareTrainingData:
         Returns:
         - pd.DataFrame: The modified DataFrame with the 'timestamp' column removed.
         """
-        data = data.drop(columns=['timestamp'])
+        try:
+            data = data.drop(columns=['timestamp'])
+        except Exception as e:
+            self.logger.error(f'Error removing timestamp column: {str(e)}')
         return data
         
     def add_return(self, data: pd.DataFrame) -> pd.DataFrame:
@@ -109,7 +120,10 @@ class PrepareTrainingData:
         - pd.DataFrame: The modified DataFrame with an additional 'return' column.
             The 'return' column contains the daily return values calculated as (close - open) / close.
         """
-        data['return'] = (data['close'] - data['open']) / data['close']
+        try:
+            data['return'] = (data['close'] - data['open']) / data['close']
+        except Exception as e:
+            self.logger.error(f'Error adding return column: {str(e)}')
         return data
     
     def add_direction(self, data: pd.DataFrame, remove_zeros: bool=True) -> pd.DataFrame:

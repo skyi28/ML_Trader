@@ -45,10 +45,25 @@ def bot_train(bot_id: int):
         # TODO get model specific data such us batch size and epochs from the request
             
         if bot[7].lower() == 'xgboost':
+            # TODO Call from new thread
             # TODO call the train function of xgboost and save the trained model in the database
-            pass
+            xgbmodel = XGBoostModel(bot[0])
+            # TODO get hyper parameters from database
+            model = xgbmodel.create_model()
+            model = xgbmodel.train(
+                user=current_user.get_id(),
+                model_id=bot[0],
+                model=model,
+                start_date=start_time,
+                end_date=end_time,
+                train_size=data_percentage
+                )
             
         return f'{params}'
+    
+def bot_train_execute() -> None:
+    # TODO this should become the function which should be executed by the thread
+    pass
 
 
 @login_required

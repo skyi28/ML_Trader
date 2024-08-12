@@ -23,11 +23,11 @@
         <form id="trainingForm" method="POST" action="/train/{{ bot[0] }}">
             <div class="form-group">
                 <label for="startTime">Start Time:</label>
-                <input type="datetime-local" id="startTime" name="startTime" class="input-field">
+                <input type="datetime-local" id="startTime" name="startTime" class="input-field" required>
             </div>
             <div class="form-group">
                 <label for="endTime">End Time:</label>
-                <input type="datetime-local" id="endTime" name="endTime" class="input-field">
+                <input type="datetime-local" id="endTime" name="endTime" class="input-field" required>
             </div>
             <div class="form-group">
                 <input type="checkbox" id="untilNow" name="untilNow">
@@ -35,7 +35,7 @@
             </div>
             <div class="form-group">
                 <label for="dataPercentage">Data Percentage for Training:</label>
-                <input type="number" id="dataPercentage" name="dataPercentage" min="0" max="100" class="input-field">
+                <input type="number" id="dataPercentage" name="dataPercentage" min="0" max="100" class="input-field" required>
             </div>
             <div class="form-group">
                 <input type="checkbox" id="useAllData" name="useAllData">

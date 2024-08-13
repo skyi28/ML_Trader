@@ -15,6 +15,7 @@ for part in basedir_split:
 import pandas as pd
 import datetime
 import xgboost as xgb
+import pickle
 
 from config.config import load_config
 
@@ -99,7 +100,7 @@ class XGBoostModel(ModelBase):
     
     # TODO Function to create model from the database
     
-    def train(self, user: int, model_id: int, model: xgb.XGBClassifier, start_date: datetime.datetime, end_date: datetime.datetime, train_size: float) -> None: # TODO pass model as parameter to be trained
+    def train(self, user: int, model_id: int, model: xgb.XGBClassifier, start_date: datetime.datetime, end_date: datetime.datetime, train_size: float) -> None:
         """
         Trains the XGBoost model using data from the specified symbol and technical indicators within the given date range.
 
@@ -117,13 +118,13 @@ class XGBoostModel(ModelBase):
         symbol: str = self.get_symbol_from_database(user, model_id)
         technical_indicators: list[str] = self.get_technical_indicators_from_database(user, model_id)
         
-        # data pipeline
         data = self.ptd.load_data(symbol, feature_columns=technical_indicators, min_date=start_date, max_date=end_date)
         data = data.pipe(self.ptd.remove_na).pipe(self.ptd.remove_timestamp).pipe(self.ptd.add_return).pipe(self.ptd.add_direction, remove_zeros=True)
         features, target = self.ptd.create_features_and_targets(data)        
                 
         model.fit(features, target)
-        return model
+        
+        self.save_model(model, user, model_id)
     
     def train_old(self, model, features: pd.DataFrame, target: pd.Series):
         # TODO Error handling
@@ -135,7 +136,3 @@ class XGBoostModel(ModelBase):
         return model.predict(features)
         
     # TODO Function for calculating error metrics
-    
-    # TODO Function for saving model as pickle file
-    
-    # TODO Function for loading model from pickle file

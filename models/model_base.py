@@ -11,6 +11,8 @@ for part in basedir_split:
         path_to_config += f'{os.sep}config'
         break
     
+import pickle
+    
 from config.config import load_config
 from infrastructure.database import Database
 
@@ -66,3 +68,11 @@ class ModelBase():
         symbol = self.db.execute_read_query(query, return_type='pd.DataFrame')
         symbol = symbol['symbol'].iloc[0]
         return symbol.lower()
+    
+    def save_model(self, model, user: int, model_id: int) -> None:
+        serialized_model = pickle.dumps(model)
+        self.db.save_model(user, model_id, serialized_model)
+    
+    def load_model(self, user: int, model_id: int):
+        model = pickle.loads(self.db.load_model(user, model_id))
+        return model

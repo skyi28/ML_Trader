@@ -46,7 +46,6 @@ def bot_train(bot_id: int):
             
         if bot[7].lower() == 'xgboost':
             # TODO Call from new thread
-            # TODO call the train function of xgboost and save the trained model in the database
             xgbmodel = XGBoostModel(bot[0])
             # TODO get hyper parameters from database
             model = xgbmodel.create_model()

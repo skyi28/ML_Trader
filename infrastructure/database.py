@@ -415,3 +415,33 @@ class Database:
         self.execute_write_query(query)
         self.commit()
         
+    def save_model(self, user, model_id, model) -> None:
+        """
+        Saves a trained model to the 'bots' table in the PostgreSQL database.
+
+        Parameters:
+        - user (int): The unique identifier of the user who created the bot.
+        - model_id (int): The unique identifier of the bot for which the model is being saved.
+        - model (object): The trained model to be saved.
+
+        Returns:
+        - None: The function does not return any value. It saves the model to the database.
+        """
+        query: str = f'UPDATE bots SET pickled=%s WHERE "user"={user} AND "id"={model_id}'
+        self.execute_write_query(query, (model,))
+        self.commit()
+        
+    def load_model(self, user, model_id):
+        """
+        Retrieves and loads a trained model from the 'bots' table in the PostgreSQL database.
+
+        Parameters:
+        - user (int): The unique identifier of the user who created the bot.
+        - model_id (int): The unique identifier of the bot for which the model is being retrieved.
+
+        Returns:
+        - model (object): The trained model retrieved from the database.
+        """
+        query: str = f"SELECT pickled FROM bots WHERE user={user} AND id={model_id}"
+        model = self.execute_read_query(query, first_only=True)[0]
+        return model

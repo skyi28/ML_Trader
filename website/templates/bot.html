@@ -6,6 +6,7 @@
     <title>Trading Bot Dashboard</title>
     <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bot.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
     <script src="{{ url_for('static', filename='js/bot.js') }}"></script>
 </head>
 <body>
@@ -30,6 +31,17 @@
             <div class="buttons-section">
                 <button id="startStopBot" onclick="toggleBot()">Start Bot</button>
                 <button id="retrainModel"><a href="/train/{{ bot[0] }}">(Re)train Model</a></button>
+            </div>
+            <div class="bot-info-section">
+                <h2>Bot Information</h2>
+                <ul>
+                    <li><strong>Name:</strong> {{ bot[2] }}</li>
+                    <li><strong>Model Type:</strong> {{ bot[7] }}</li>
+                    <li id="currently-training"><strong>Currently Training:</strong> <span id="training-status-value">{{ bot[11] }}</span><span id="loading-animation" class="hidden"></span></li>
+                    <li><strong>Last Trained:</strong> {{ bot[4] }}</li>
+                    <li><strong>Overall Performance:</strong></li>
+                    <li><strong>Current Prediction:</strong></li>
+                </ul>
             </div>
             <div class="trades-section">
                 <h2>Last Trades</h2>
@@ -63,6 +75,11 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        // Start checking training status when the page loads
+        var user = '{{ user.get_id() }}';
+        var bot_id = '{{ bot[0] }}';
+        window.onload = checkTrainingStatus(user, bot_id);
+
         const ctx = document.getElementById('priceGraph').getContext('2d');
 
         const data = [32000, 34000, 36000, 38000, 37000, 39000, 40000];

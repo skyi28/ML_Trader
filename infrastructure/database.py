@@ -386,9 +386,9 @@ class Database:
         Returns:
         - None: The function does not return any value. It inserts a new bot into the database.
         """
-        query: str = 'INSERT INTO bots (id, "user", name, created, last_trained, symbol, timeframe, model_type, technical_indicators, hyper_parameters, pickled)'
-        query += f" VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        self.execute_write_query(query, (new_id, user, name, datetime.datetime.now(), None, symbol, timeframe, model_type, technical_indicators.lower(), hyper_parameters, None))
+        query: str = 'INSERT INTO bots (id, "user", name, created, last_trained, symbol, timeframe, model_type, technical_indicators, hyper_parameters, pickled, training)'
+        query += f" VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        self.execute_write_query(query, (new_id, user, name, datetime.datetime.now(), None, symbol, timeframe, model_type, technical_indicators.lower(), hyper_parameters, None, None))
         self.commit()
         
     def get_all_bots_by_user(self, user_id: int):

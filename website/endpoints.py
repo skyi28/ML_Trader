@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import json
 import threading
 import datetime
+import time
 
 from website.user import User
 from website.app import db
@@ -89,6 +90,10 @@ def bot_train_execute(user: int, bot: list, start_time: datetime.datetime, end_t
             end_date=end_time,
             train_size=data_percentage
             )
+        
+    # Add other model types here
+    # TODO DELETE
+    time.sleep(5)
     
     postgres_db.update_table(
         table_name='bots',
@@ -169,7 +174,7 @@ def dashboard():
     This function renders the dashboard page with the current user's information and a default symbol.
 
     Parameters:
-    None
+    - None
 
     Returns:
     render_template: A Flask function that renders a template with the provided arguments.

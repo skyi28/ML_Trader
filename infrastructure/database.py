@@ -333,7 +333,26 @@ class Database:
             self.logger.error(f'count_rows_of_table: Error counting the rows: {str(e)}')
             return None
         
-    def provide_uniue_id(self, table: str) -> int:
+    def update_table(self, table_name: str, column: str, value, where_condition: str = None) -> None:
+        """
+        Updates a specified column in a specified table with a new value.
+
+        Parameters:
+        - table_name (str): The name of the table where the update will be performed.
+        - column (str): The name of the column to be updated.
+        - value: The new value to be assigned to the specified column.
+        - where_condition (str, optional): A condition that determines which rows will be updated. If not provided, all rows in the specified column will be updated.
+
+        Returns:
+        - None: The function does not return any value. It updates the specified column in the database.
+        """
+        query: str = f"UPDATE {table_name} SET {column}=%s"
+        if where_condition:
+            query += f" {where_condition}"
+        self.execute_write_query(query, (value,))
+        self.commit()
+
+    def provide_unique_id(self, table: str) -> int:
         """
         This function retrieves the highest ID from a specified table in the PostgreSQL database and returns the next unique ID.
         If the table is empty, it returns 1 as the first unique ID.

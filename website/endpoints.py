@@ -33,7 +33,7 @@ def bot_train(bot_id: int):
         indicators = bot[8].split(',')
         return render_template('bot_train.html', user=current_user, bot=bot, indicators=indicators)
     elif request.method == 'POST':
-        # TODO Write a function which acutally trains the model after all user inputs
+        # TODO Write a function which actually trains the model after all user inputs
         params: dict = request.form.to_dict()
         start_time: datetime.datetime = datetime.datetime.strptime(params['startTime'], '%Y-%m-%dT%H:%M')
         end_time: datetime.datetime = datetime.datetime.strptime(params['endTime'], '%Y-%m-%dT%H:%M')
@@ -43,26 +43,66 @@ def bot_train(bot_id: int):
             data_percentage = float(params['dataPercentage']) / 100
             
         # TODO get model specific data such us batch size and epochs from the request
+        bot_train_thread_args = (
+            current_user.get_id(),
+            bot,
+            start_time,
+            end_time,
+            data_percentage
+        )
+        bot_train_thread = threading.Thread(target=bot_train_execute, args=bot_train_thread_args)    
+        bot_train_thread.start()
             
-        if bot[7].lower() == 'xgboost':
-            # TODO Call from new thread
-            xgbmodel = XGBoostModel(bot[0])
-            # TODO get hyper parameters from database
-            model = xgbmodel.create_model()
-            model = xgbmodel.train(
-                user=current_user.get_id(),
-                model_id=bot[0],
-                model=model,
-                start_date=start_time,
-                end_date=end_time,
-                train_size=data_percentage
-                )
-            
-        return f'{params}'
+        return redirect(f'/bot/{bot[0]}')
     
-def bot_train_execute() -> None:
-    # TODO this should become the function which should be executed by the thread
-    pass
+def bot_train_execute(user: int, bot: list, start_time: datetime.datetime, end_time: datetime.datetime, data_percentage: float) -> None:
+    """
+    This function is responsible for executing the training process for a specific bot and is called by a separate thread.
+    It checks the bot's model type and performs the necessary actions based on the model.
+
+    Parameters:
+    - user (int): The ID of the user who owns the bot.
+    - bot (list): A list containing information about the bot, including its ID, model type, etc.
+    - start_time (datetime.datetime): The start time for training data.
+    - end_time (datetime.datetime): The end time for training data.
+    - data_percentage (float): The percentage of data to be used for training.
+
+    Returns:
+    - None: This function does not return any value.
+    """
+    postgres_db.update_table(
+        table_name='bots',
+        column='training',
+        value=True,
+        where_condition=f'WHERE "user"={user} AND "id"={bot[0]}'
+    )
+    
+    if bot[7].lower() == 'xgboost':
+        xgbmodel = XGBoostModel(bot[0])
+        # TODO get hyper parameters from database
+        model = xgbmodel.create_model()
+        model = xgbmodel.train(
+            user=user,
+            model_id=bot[0],
+            model=model,
+            start_date=start_time,
+            end_date=end_time,
+            train_size=data_percentage
+            )
+    
+    postgres_db.update_table(
+        table_name='bots',
+        column='last_trained',
+        value=datetime.datetime.now(),
+        where_condition=f'WHERE "user"={user} AND "id"={bot[0]}'
+    )
+
+    postgres_db.update_table(
+        table_name='bots',
+        column='training',
+        value=False,
+        where_condition=f'WHERE "user"={user} AND "id"={bot[0]}'
+    )
 
 
 @login_required
@@ -108,7 +148,7 @@ def bot_creation():
         else:
             hyper_parameters = json.dumps({})
             
-        new_id = postgres_db.provide_uniue_id('bots')
+        new_id = postgres_db.provide_unique_id('bots')
         
         postgres_db.insert_new_bot(
             new_id=new_id,
@@ -229,7 +269,7 @@ def sign_up():
         elif len(password1) < 7:
             flash('Password must be at least 7 characters.', category='error')
         else:
-            new_user_id = postgres_db.provide_uniue_id(table='user')
+            new_user_id = postgres_db.provide_unique_id(table='user')
             new_user = User(id=new_user_id, email=email, first_name=first_name, last_name=last_name, password=generate_password_hash(password1))
             db.session.add(new_user)
             db.session.commit()

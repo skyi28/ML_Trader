@@ -6,6 +6,10 @@ function toggleSidebar() {
     sidebarDots.classList.toggle('rotate-90');
 }
 
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 function checkTrainingStatus(user, bot_id) {
     const url = '/api/bot_training_status/' + user + '/' + bot_id;
     const trainingStatusValue = document.getElementById('training-status-value');

@@ -303,6 +303,30 @@ button:hover {
     text-align: left;
 }
 
+.fixed-button {
+    position: fixed; /* Fix the button's position */
+    bottom: 20px; /* Distance from the bottom */
+    right: 20px; /* Distance from the right */
+    background-color: #4BC0C0; /* Button background color */
+    color: #ffffff; /* Arrow color */
+    border: none;
+    border-radius: 50%; /* Round button */
+    width: 50px; /* Button width */
+    height: 50px; /* Button height */
+    display: flex;
+    align-items: center; /* Center arrow vertically */
+    justify-content: center; /* Center arrow horizontally */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000; /* Ensure the button stays above other content */
+    transition: background-color 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+}
+
+.fixed-button:hover {
+    background-color: #36a9a4; /* Change color on hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
 #sidebar_dots {
     transition: transform 0.3s ease-in-out;
 }

@@ -72,11 +72,12 @@ class ModelBase():
         return symbol.lower()
 
     def save_model(self, model, user: int, model_id: int) -> None:
-        serialized_model = pickle.dumps(model)
-        self.db.save_model(user, model_id, serialized_model)
+        path_to_model: str = self.config.path_to_models.replace(f'{os.sep}config','')
+        pickle.dump(model, open(f'{path_to_model}model_{user}_{model_id}.pkl', 'wb'))
 
     def load_model(self, user: int, model_id: int):
-        model = pickle.loads(self.db.load_model(user, model_id))
+        path_to_model: str = self.config.path_to_models.replace(f'{os.sep}config','')
+        model = pickle.load(open(f'{path_to_model}model_{user}_{model_id}.pkl', 'rb'))
         return model
 
     def create_confusion_matrix(self, y_test: np.array, y_pred: np.array) -> np.array:

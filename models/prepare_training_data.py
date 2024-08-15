@@ -35,6 +35,34 @@ class PrepareTrainingData:
         self.db = Database()
         self.logger = create_logger('prepare_training_data.log')
         
+    def load_data_for_prediction(self, symbol, feature_columns: list[str]) -> pd.DataFrame:
+        """
+        Load the latest data for a specific symbol from the database for prediction purposes.
+
+        This function constructs a SQL query to retrieve the latest data for a given symbol from the database.
+        If 'open' or 'close' columns are not specified in the feature_columns list, they are added at the beginning.
+        The function assumes that the historic price data is inserted in ascending order by time.
+
+        Parameters:
+        - symbol (str): The symbol for which data needs to be retrieved.
+        - feature_columns (list[str]): A list of column names to select. If 'open' or 'close' are not included, they are added at the beginning.
+
+        Returns:
+        - pd.DataFrame: A pandas DataFrame containing the latest data for the specified symbol.
+        """
+        if 'open' not in feature_columns:
+            feature_columns.insert(0, 'open')
+        if 'close' not in feature_columns:
+            feature_columns.insert(1,'close')
+
+        # This assumes that the historic price data is inserted ascending by time
+        query = f"SELECT {','.join(feature_columns)} FROM {symbol} ORDER BY timestamp DESC LIMIT(1)"
+        data: pd.DataFrame = self.db.execute_read_query(query, return_type='pd.DataFrame')
+        data = self.add_return(data)
+        data = self.remove_na(data)
+        return data
+
+        
     def load_data(self, symbol: str, feature_columns: list[str] = None, min_date: str = None, max_date: str = None) -> pd.DataFrame:
         """
         Load data from the database for a specific symbol.

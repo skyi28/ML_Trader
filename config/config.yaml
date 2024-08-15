@@ -23,6 +23,7 @@ tradeable_symbols: ["BTCUSD","ETHUSD"]
 price_update_interval: 15
 
 # TODO Output paths for models
+path_to_models: <<project_root>>/models/saved_models/ # don't use quotes here
 
 technical_indicators:
   indicators: ["moving_average", "exponential_moving_average", "moving_std", "periodic_highs", "periodic_lows", "bollinger_bands", "macd", "rsi", "momentum"]

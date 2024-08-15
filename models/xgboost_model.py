@@ -27,7 +27,7 @@ from models.model_base import ModelBase
 from models.prepare_training_data import PrepareTrainingData
 
 class XGBoostModel(ModelBase):
-    def __init__(self, id: int) -> None:
+    def __init__(self) -> None:
         """
         Initialize the XGBoostModel class with the provided id.
 

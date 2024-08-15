@@ -462,7 +462,7 @@ class Database:
         Returns:
         - model (object): The trained model retrieved from the database.
         """
-        query: str = f"SELECT pickled FROM bots WHERE user={user} AND id={model_id}"
+        query: str = f'SELECT pickled FROM bots WHERE "user"={user} AND "id"={model_id}'
         model = self.execute_read_query(query, first_only=True)[0]
         return model
     
@@ -500,6 +500,16 @@ class Database:
         """
         # TODO error handling
         query: str = f'SELECT training_error_metrics FROM bots WHERE "user"={user} AND "id"={model_id}'
-        print(query)
         data = self.execute_read_query(query)
         return data[0][0]
+    
+    def set_running(self, user: int, model_id: str, value: bool) -> None:
+        query: str = f'UPDATE bots SET running={value} WHERE "user"={user} AND "id"={model_id}'
+        self.execute_write_query(query)
+        self.commit()
+
+    def get_all_running_models(self) -> pd.DataFrame:
+        query: str = f'SELECT "user", "id", model_type, symbol, technical_indicators FROM bots WHERE running=True'
+        data = self.execute_read_query(query, return_type='pd.DataFrame')
+        return data
+        

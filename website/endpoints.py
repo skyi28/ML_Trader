@@ -86,7 +86,7 @@ def bot_train_execute(user: int, bot: list, start_time: datetime.datetime, end_t
     )
     
     if bot[7].lower() == 'xgboost':
-        xgbmodel = XGBoostModel(bot[0])
+        xgbmodel = XGBoostModel()
         # TODO get hyper parameters from database
         model = xgbmodel.create_model()
         model = xgbmodel.train(

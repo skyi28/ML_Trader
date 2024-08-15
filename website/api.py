@@ -14,6 +14,7 @@ api = Blueprint('api', __name__)
 
 postgres_db = Database()
 
+@login_required
 @api.route('/api/chart_data')
 def chart_data() -> dict:
     """
@@ -44,6 +45,7 @@ def chart_data() -> dict:
     
     return json.dumps(result)
     
+@login_required
 @api.route('/api/last_price')
 def get_last_price() -> dict:
     """
@@ -60,6 +62,7 @@ def get_last_price() -> dict:
     query_result: pd.DataFrame = postgres_db.execute_read_query(f"SELECT * FROM prices WHERE symbol='{symbol}' ORDER BY timestamp DESC LIMIT 1", return_type="pd.DataFrame")
     return query_result.to_json()
 
+@login_required
 @api.route('/api/bot_training_status/<int:user>/<int:bot_id>')
 def get_bot_training_status(user: int, bot_id: int) -> dict:
     """
@@ -75,5 +78,25 @@ def get_bot_training_status(user: int, bot_id: int) -> dict:
     """
     query_result: pd.DataFrame = postgres_db.execute_read_query(f'SELECT training FROM bots WHERE "user"={user} AND id={bot_id}', return_type='pd.DataFrame')
     result = json.dumps({"training": str(query_result['training'].iloc[0])})
-    print(f'QUERY RESULT: {result}')
+    return result
+
+@login_required
+@api.route('/api/bot_training_error_metrics/<int:user>/<int:bot_id>')
+def get_bot_training_error_metrics(user: int, bot_id: int) -> dict:
+    """
+    Retrieves the training error metrics for a specific bot for a given user from a PostgreSQL database.
+
+    Parameters:
+    - user (int): The unique identifier of the user. This parameter is used to identify the user in the database.
+    - bot_id (int): The unique identifier of the bot. This parameter is used to identify the bot in the database.
+
+    Returns:
+    - dict: A JSON string representing the training error metrics of the bot.
+    """
+    query_result: dict = postgres_db.get_training_error_metrics(user=user, model_id=bot_id)
+    result = json.dumps(query_result)
+    print('-'*100)
+    print(query_result)
+    print(result)
+    print('-'*100)
     return result

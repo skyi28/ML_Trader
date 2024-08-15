@@ -137,7 +137,6 @@ class XGBoostModel(ModelBase):
         confusion_matrix: list = self.create_confusion_matrix(target_test, pred).tolist()
         confusion_matrix: dict = json.dumps(confusion_matrix)
         
-        # Make sure that the keys of the metrics dict match the column names in the database
         metrics: dict = {
             'confusion_matrix': confusion_matrix,
             'accuracy': self.calc_accuracy(target_test, pred),

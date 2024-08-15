@@ -16,6 +16,7 @@ import pandas as pd
 import datetime
 import psycopg2
 from sqlalchemy import create_engine, Engine
+import json
 
 from config.config import load_config
 from infrastructure.logger import create_logger
@@ -466,15 +467,39 @@ class Database:
         return model
     
     def insert_training_error_metrics(self, user: int, model_id: int, metrics: dict) -> None:
-        for key in metrics.keys():
-            try:
-                self.update_table(
-                    table_name='bots',
-                    column=key,
-                    value=metrics[key],
-                    where_condition=f'WHERE "user"={user} AND "id"={model_id}'
-                )
-            except Exception as e:
-                self.logger.error(f'insert_training_error_metrics: Error inserting training error metric {key}: {str(e)} for user {user} and model {model_id}')
+        """
+        Inserts training error metrics for a specific bot into the 'bots' table in the PostgreSQL database.
+
+        Parameters:
+        - user (int): The unique identifier of the user who created the bot.
+        - model_id (int): The unique identifier of the bot for which the training error metrics are being inserted.
+        - metrics (dict): A dictionary containing the training error metrics to be inserted.
+
+        Returns:
+        - None: The function does not return any value. It inserts the training error metrics into the database.
+        """
+        self.update_table(
+            table_name='bots', 
+            column='training_error_metrics',
+            value=json.dumps(metrics),
+            where_condition=f'WHERE "user"={user} AND "id"={model_id}')
+
         self.commit()
+
     
+    def get_training_error_metrics(self, user: int, model_id: int) -> dict:
+        """
+        Retrieves the training error metrics for a specific bot from the 'bots' table in the PostgreSQL database.
+
+        Parameters:
+        - user (int): The unique identifier of the user who created the bot.
+        - model_id (int): The unique identifier of the bot for which the training error metrics are being retrieved.
+
+        Returns:
+        - dict: A dictionary containing the training error metrics for the specified bot.
+        """
+        # TODO error handling
+        query: str = f'SELECT training_error_metrics FROM bots WHERE "user"={user} AND "id"={model_id}'
+        print(query)
+        data = self.execute_read_query(query)
+        return data[0][0]

@@ -77,7 +77,8 @@ data_thread.start()
 db.create_table('"user"', ['id INT','email VARCHAR','password VARCHAR','first_name VARCHAR','last_name VARCHAR'], primary_keys=['id'])
 
 # Create bots table
-db.create_table('bots', ['id INT', '"user" INT', 'name VARCHAR', 'created TIMESTAMP', 'last_trained TIMESTAMP', 'symbol VARCHAR', 'timeframe INT', 'model_type VARCHAR', 'technical_indicators VARCHAR', 'hyper_parameters JSON', 'pickled BYTEA', 'training BOOL', 'training_set_percentage FLOAT', 'confusion_matrix JSON', 'accuracy FLOAT', 'balanced_accuracy FLOAT', 'precision FLOAT', 'recall FLOAT'], primary_keys=['id'])
+# db.create_table('bots', ['id INT', '"user" INT', 'name VARCHAR', 'created TIMESTAMP', 'last_trained TIMESTAMP', 'symbol VARCHAR', 'timeframe INT', 'model_type VARCHAR', 'technical_indicators VARCHAR', 'hyper_parameters JSON', 'pickled BYTEA', 'training BOOL', 'training_set_percentage FLOAT', 'confusion_matrix JSON', 'accuracy FLOAT', 'balanced_accuracy FLOAT', 'precision FLOAT', 'recall FLOAT'], primary_keys=['id'])
+db.create_table('bots', ['id INT', '"user" INT', 'name VARCHAR', 'created TIMESTAMP', 'last_trained TIMESTAMP', 'symbol VARCHAR', 'timeframe INT', 'model_type VARCHAR', 'technical_indicators VARCHAR', 'hyper_parameters JSON', 'pickled BYTEA', 'training BOOL', 'training_set_percentage FLOAT', 'training_error_metrics JSON'], primary_keys=['id'])
 
 logger.info('Start web application')
 app = create_app()

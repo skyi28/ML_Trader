@@ -7,6 +7,8 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bot.css') }}">
     <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="{{ url_for('static', filename='js/bot.js') }}"></script>
 </head>
 <body>
@@ -51,13 +53,114 @@
                     <ul>
                         <li>If 100% of the data were used for training in the last training run, the following values are determined by using the training set.</li>
                     </ul>
-                    <!-- Placeholder for the confusion matrix; replace with actual content -->
                     <div id="confusion-matrix">
-                        Here is the confusion matrix.
-                        <!-- Add your confusion matrix content here -->
+                        <span id="loading-animation" class="hidden"></span>
                     </div>
                 </div>
-                <!-- Add more metrics as needed -->
+                <div class="metric">
+                    <h3>Accuracy</h3>
+                    <div id="accuracy">
+                        <span id="loading-animation" class="hidden"></span>
+                    </div>
+                    <div class="metric-definition">
+                        <details>
+                            <summary>Further Information</summary>
+                            <div class="explanation_content">
+                                <p>Accuracy is a measure of how often the classifier is correct. It is defined as the ratio of the number of correct predictions to the total number of predictions.</p>
+                                <p>The formula for accuracy is given by:</p>
+                                <p>
+                                    \[
+                                    \text{Accuracy} = \frac{\text{TP} + \text{TN}}{\text{TP} + \text{TN} + \text{FP} + \text{FN}}
+                                    \]
+                                </p>
+                                <p>Where:</p>
+                                <ul>
+                                    <li>\(\text{TP}\) = True Positives</li>
+                                    <li>\(\text{TN}\) = True Negatives</li>
+                                    <li>\(\text{FP}\) = False Positives</li>
+                                    <li>\(\text{FN}\) = False Negatives</li>
+                                </ul>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+                <div class="metric">
+                    <h3>Balanced Accuracy</h3>
+                    <div id="balanced-accuracy">
+                        <span id="loading-animation" class="hidden"></span>
+                    </div>
+                    <div class="metric-definition">
+                        <details>
+                            <summary>Further Information</summary>
+                            <div class="explanation_content">
+                                <p>Balanced accuracy is a measure of how well the classifier performs, considering both the sensitivity (true positive rate) and the specificity (true negative rate). It is particularly useful when dealing with imbalanced datasets.</p>
+                                <p>The formula for balanced accuracy is given by:</p>
+                                <p>
+                                    \[
+                                    \text{Balanced Accuracy} = \frac{1}{2} \left( \frac{\text{TP}}{\text{TP} + \text{FN}} + \frac{\text{TN}}{\text{TN} + \text{FP}} \right)
+                                    \]
+                                </p>
+                                <p>Where:</p>
+                                <ul>
+                                    <li>\(\text{TP}\) = True Positives</li>
+                                    <li>\(\text{TN}\) = True Negatives</li>
+                                    <li>\(\text{FP}\) = False Positives</li>
+                                    <li>\(\text{FN}\) = False Negatives</li>
+                                </ul>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+                <div class="metric">
+                    <h3>Precision</h3>
+                    <div id="precision">
+                        <span id="loading-animation" class="hidden"></span>
+                    </div>
+                    <div class="metric-definition">
+                        <details>
+                            <summary>Further Information</summary>
+                            <div class="explanation_content">
+                                <p>Precision is a measure of how many of the positively classified instances were actually correct. It is defined as the ratio of true positives to the sum of true positives and false positives.</p>
+                                <p>The formula for precision is given by:</p>
+                                <p>
+                                    \[
+                                    \text{Precision} = \frac{\text{TP}}{\text{TP} + \text{FP}}
+                                    \]
+                                </p>
+                                <p>Where:</p>
+                                <ul>
+                                    <li>\(\text{TP}\) = True Positives</li>
+                                    <li>\(\text{FP}\) = False Positives</li>
+                                </ul>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+                <div class="metric">
+                    <h3>Recall</h3>
+                    <div id="recall">
+                        <span id="loading-animation" class="hidden"></span>
+                    </div>
+                    <div class="metric-definition">
+                        <details>
+                            <summary>Further Information</summary>
+                            <div class="explanation_content">
+                                <p>Recall, also known as Sensitivity or True Positive Rate, is a measure of how well the classifier identifies positive instances. It is defined as the ratio of true positives to the sum of true positives and false negatives.</p>
+                                <p>The formula for recall is given by:</p>
+                                <p>
+                                    \[
+                                    \text{Recall} = \frac{\text{TP}}{\text{TP} + \text{FN}}
+                                    \]
+                                </p>
+                                <p>Where:</p>
+                                <ul>
+                                    <li>\(\text{TP}\) = True Positives</li>
+                                    <li>\(\text{FN}\) = False Negatives</li>
+                                </ul>
+                            </div>
+                        </details>
+                    </div>
+                </div>
             </div>
             <div class="trades-section">
                 <h2>Last Trades</h2>
@@ -71,7 +174,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Example rows, replace with dynamic content -->
                         <tr>
                             <td>12:01</td>
                             <td>Buy</td>
@@ -91,22 +193,18 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Start checking training status when the page loads
         var user = '{{ user.get_id() }}';
         var bot_id = '{{ bot[0] }}';
         window.onload = function() {
             checkTrainingStatus(user, bot_id);
-            checkLastTrained();
+            checkLastTrained(user, bot_id);
         }
 
         const ctx = document.getElementById('priceGraph').getContext('2d');
-
         const data = [32000, 34000, 36000, 38000, 37000, 39000, 40000];
         const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
-
-        const longPositions = [1, 4]; // Indices of long positions
-        const shortPositions = [2, 5]; // Indices of short positions
-
+        const longPositions = [1, 4];
+        const shortPositions = [2, 5];
         const positionInfo = new Array(data.length).fill('');
         longPositions.forEach(index => positionInfo[index] = 'Long Position');
         shortPositions.forEach(index => positionInfo[index] = 'Short Position');
@@ -129,9 +227,9 @@
                     }),
                     pointBackgroundColor: data.map((_, index) => {
                         if (longPositions.includes(index)) {
-                            return '#00FF00'; // Green for long positions
+                            return '#00FF00';
                         } else if (shortPositions.includes(index)) {
-                            return '#FF0000'; // Red for short positions
+                            return '#FF0000';
                         }
                         return 'transparent';
                     }),
@@ -146,10 +244,10 @@
                         title: {
                             display: true,
                             text: 'Month',
-                            color: 'white' // Set X-axis title color to white
+                            color: 'white'
                         },
                         ticks: {
-                            color: 'white' // Set X-axis labels color to white
+                            color: 'white'
                         }
                     },
                     y: {
@@ -157,10 +255,10 @@
                         title: {
                             display: true,
                             text: 'Price in USD',
-                            color: 'white' // Set Y-axis title color to white
+                            color: 'white'
                         },
                         ticks: {
-                            color: 'white' // Set Y-axis labels color to white
+                            color: 'white'
                         }
                     }
                 },
@@ -183,17 +281,11 @@
             const button = document.getElementById('startStopBot');
             if (button.textContent === 'Start Bot') {
                 button.textContent = 'Stop Bot';
-                button.style.backgroundColor = '#DC3545'; // Red for stop
-                // TODO call method which starts the bot
+                button.style.backgroundColor = '#DC3545';
             } else {
                 button.textContent = 'Start Bot';
-                button.style.backgroundColor = '#4BC0C0'; // Original color for start
-                // TODO call method which stops the bot
+                button.style.backgroundColor = '#4BC0C0';
             }
-        }
-
-        function retrainModel() {
-            alert('Retraining the model...');
         }
     </script>
 </body>

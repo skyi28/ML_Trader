@@ -25,6 +25,7 @@ function checkTrainingStatus(user, bot_id) {
                 } else {
                     trainingStatusValue.textContent = 'False';
                     loadingAnimation.style.visibility = 'hidden';
+                    checkLastTrained(user, bot_id)
                     clearInterval(intervalId); // Stop the interval
                 }
             },
@@ -38,7 +39,7 @@ function checkTrainingStatus(user, bot_id) {
     const intervalId = setInterval(fetchStatus, 1000); // TODO Change interval to 1000ms
 }
 
-function checkLastTrained(){
+function checkLastTrained(user, bot_id){
     const lastTrainedValue = document.getElementById('lastTrained').textContent;
     console.log("LastTrainedValue" + lastTrainedValue);
     if (lastTrainedValue.toLowerCase().includes('None'.toLowerCase())) {
@@ -47,5 +48,45 @@ function checkLastTrained(){
     } else {
         console.log("LastTrainedValue does not include None --> set to visible")
         document.getElementById('training-metrics-section').style.display = 'initial';
+        getErrorMetrics(user, bot_id)
     }
+}
+
+function getErrorMetrics(user, bot_id) {
+    const url = '/api/bot_training_error_metrics/' + user + '/' + bot_id;
+
+    $.get(url, function(data) {
+        data = JSON.parse(data);
+        console.log(data["confusion_matrix"])
+        const confusionMatrix = JSON.parse(data["confusion_matrix"]);
+        const accuracy = data["accuracy"];
+        const balancedAccuracy = data["balanced_accuracy"];
+        const precision = data["precision"];
+        const recall = data["recall"];
+
+        $('#confusion-matrix').html(`
+            <table>
+                <tr>
+                    <th></th>
+                    <th>Predicted Decreasing</th>
+                    <th>Predicted Increasing</th>
+                </tr>
+                <tr>
+                    <th>Actual Decreasing</th>
+                    <td>${confusionMatrix[0][0]}</td>
+                    <td>${confusionMatrix[0][1]}</td>
+                </tr>
+                <tr>
+                    <th>Actual Increasing</th>
+                    <td>${confusionMatrix[1][0]}</td>
+                    <td>${confusionMatrix[1][1]}</td>
+                </tr>
+            </table>
+        `);
+
+        $('#accuracy').text(`Accuracy: ${accuracy}`);
+        $('#balanced-accuracy').text(`Balanced Accuracy: ${balancedAccuracy}`);
+        $('#precision').text(`Precision: ${precision}`);
+        $('#recall').text(`Recall: ${recall}`);
+    });
 }

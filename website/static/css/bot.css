@@ -255,12 +255,52 @@ button:hover {
 }
 
 #confusion-matrix {
-    /* Style for confusion matrix; customize as needed */
+    width: 50%;
     color: #ffffff;
-    background-color: #1e2a38;
+    background-color: #011627;
     padding: 10px;
     border-radius: 5px;
     overflow: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#confusion-matrix table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+#confusion-matrix th, #confusion-matrix td {
+    padding: 10px;
+    border: 1px solid #4BC0C0;
+    text-align: center; /* Ensure text is centered */
+    vertical-align: middle; /* Center vertically */
+}
+
+#confusion-matrix th {
+    background-color: #4BC0C0;
+    color: #011627;
+    text-transform: uppercase;
+}
+
+.metric-definition {
+    padding-top: 10px;
+    background-color: #011627;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.explanation_content {
+    background-color: #36a9a4;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.metric-definition p {
+    margin: 10px;
+    text-align: left;
 }
 
 #sidebar_dots {

@@ -40,7 +40,7 @@ function checkTrainingStatus(user, bot_id) {
     }
 
     // Set the interval to call fetchStatus every second
-    const intervalId = setInterval(fetchStatus, 1000); // TODO Change interval to 1000ms
+    const intervalId = setInterval(fetchStatus, 1000);
 }
 
 function checkLastTrained(user, bot_id){

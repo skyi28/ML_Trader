@@ -12,7 +12,7 @@ function fetch_chart_data(symbol, entries, ctx) {
                 ctx,
                 response['dates'], // Labels
                 response['price_data'], // Data
-                response['symbol'], // Label # TODO Symbol needs to be passed by API as well
+                response['symbol'], // Label 
                 'rgba(75, 192, 192, 1)', // Line color
                 'rgba(75, 192, 192, 0.2)', // Fill color
                 'Time', // X-axis title

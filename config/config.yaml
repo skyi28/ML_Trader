@@ -16,13 +16,13 @@ postgres:
 webserver:
   host: 127.0.0.1
   port: 5000
-  debug_mode: True
+  debug_mode: False
 
 tradeable_symbols: ["BTCUSD","ETHUSD"]
+trading_fees: 0.00 / 100 # 0.06 / 100 # Lookup trading fees on Bybit
 
 price_update_interval: 15
 
-# TODO Output paths for models
 path_to_models: <<project_root>>/models/saved_models/ # don't use quotes here
 
 technical_indicators:

@@ -387,9 +387,9 @@ class Database:
         Returns:
         - None: The function does not return any value. It inserts a new bot into the database.
         """
-        query: str = 'INSERT INTO bots (id, "user", name, created, last_trained, symbol, timeframe, model_type, technical_indicators, hyper_parameters, pickled, training)'
-        query += f" VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        self.execute_write_query(query, (new_id, user, name, datetime.datetime.now(), None, symbol, timeframe, model_type, technical_indicators.lower(), hyper_parameters, None, None))
+        query: str = 'INSERT INTO bots (id, "user", name, created, last_trained, symbol, timeframe, model_type, technical_indicators, hyper_parameters, training, running, "position")'
+        query += f" VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        self.execute_write_query(query, (new_id, user, name, datetime.datetime.now(), None, symbol, timeframe, model_type, technical_indicators.lower(), hyper_parameters, None, False, 'neutral'))
         self.commit()
         
     def get_all_bots_by_user(self, user_id: int):
@@ -434,37 +434,6 @@ class Database:
         query: str = f'DELETE FROM bots WHERE id={bot_id}'
         self.execute_write_query(query)
         self.commit()
-        
-    def save_model(self, user: int, model_id: int, model) -> None:
-        """
-        Saves a trained model to the 'bots' table in the PostgreSQL database.
-
-        Parameters:
-        - user (int): The unique identifier of the user who created the bot.
-        - model_id (int): The unique identifier of the bot for which the model is being saved.
-        - model (object): The trained model to be saved.
-
-        Returns:
-        - None: The function does not return any value. It saves the model to the database.
-        """
-        query: str = f'UPDATE bots SET pickled=%s WHERE "user"={user} AND "id"={model_id}'
-        self.execute_write_query(query, (model,))
-        self.commit()
-        
-    def load_model(self, user: int, model_id: int):
-        """
-        Retrieves and loads a trained model from the 'bots' table in the PostgreSQL database.
-
-        Parameters:
-        - user (int): The unique identifier of the user who created the bot.
-        - model_id (int): The unique identifier of the bot for which the model is being retrieved.
-
-        Returns:
-        - model (object): The trained model retrieved from the database.
-        """
-        query: str = f'SELECT pickled FROM bots WHERE "user"={user} AND "id"={model_id}'
-        model = self.execute_read_query(query, first_only=True)[0]
-        return model
     
     def insert_training_error_metrics(self, user: int, model_id: int, metrics: dict) -> None:
         """
@@ -504,12 +473,34 @@ class Database:
         return data[0][0]
     
     def set_running(self, user: int, model_id: str, value: bool) -> None:
+        """
+        Updates the 'running' status of a specific bot in the 'bots' table in the PostgreSQL database.
+
+        Parameters:
+        - user (int): The unique identifier of the user who created the bot.
+        - model_id (str): The unique identifier of the bot for which the 'running' status needs to be updated.
+        - value (bool): The new value for the 'running' status. If True, the bot is considered running; otherwise, it is considered not running.
+
+        Returns:
+        - None: The function does not return any value. It updates the 'running' status of the bot in the database.
+        """
         query: str = f'UPDATE bots SET running={value} WHERE "user"={user} AND "id"={model_id}'
         self.execute_write_query(query)
         self.commit()
 
+
     def get_all_running_models(self) -> pd.DataFrame:
-        query: str = f'SELECT "user", "id", model_type, symbol, technical_indicators FROM bots WHERE running=True'
+        """
+        Retrieves all running models from the 'bots' table in the PostgreSQL database.
+
+        Parameters:
+        None
+
+        Returns:
+        pd.DataFrame: A pandas DataFrame containing the details of all running models.
+        The DataFrame has the following columns: 'user', 'id', 'model_type', 'symbol',
+        'technical_indicators', 'position', 'entry_price', 'prediction'.
+        """
+        query: str = f'SELECT "user", "id", model_type, symbol, technical_indicators, position, entry_price, prediction FROM bots WHERE running=True'
         data = self.execute_read_query(query, return_type='pd.DataFrame')
         return data
-        

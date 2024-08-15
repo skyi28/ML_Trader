@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, flash, request, url_for, send_from_directory
+from flask import Blueprint, render_template, redirect, flash, request, url_for, jsonify
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -16,25 +16,66 @@ endpoint = Blueprint('endpoints', __name__)
 
 postgres_db = Database()
 
-# TODO Figure out how to use HTML file as blueprint for other ones
+# TODO Include a check if the user who send the request is allowed to execute the method for the requested bot
+# TODO This whole file needs error handling
 
 @endpoint.route('/favicon.ico')
 def favicon():
+    """
+    This function returns the URL for the favicon.ico file located in the static/images directory.
+
+    Parameters:
+    - None
+
+    Returns:
+    - str: The URL for the favicon.ico file. This URL can be used in HTML to display the favicon.
+    """
     return url_for('static', filename='images/favicon.ico')
+
 
 @endpoint.route('/')
 def index():
     return f'Hello World'
 
+@endpoint.route('/start_stop_bot/<int:user>/<int:bot_id>/<string:action>')
+def start_stop_bot(user: int, bot_id: int, action: str) -> dict:
+    """
+    This function updates the 'running' status of a specific bot in the database based on the provided action.
+
+    Parameters:
+    - user (int): The ID of the user who owns the bot.
+    - bot_id (int): The ID of the bot to be updated.
+    - action (str): The action to be performed. It should be either 'True' or 'False' as a string.
+
+    Returns:
+    - dict: A JSON response indicating the success of the operation. The response contains a 'success' key with a boolean value.
+    """
+    postgres_db.update_table(
+        table_name='bots',
+        column='running',
+        value=eval(action),
+        where_condition=f'WHERE "user"={user} AND "id"={bot_id}'
+    )
+    return jsonify(success=True)
 @login_required
 @endpoint.route('/train/<int:bot_id>', methods=['GET', 'POST'])
-def bot_train(bot_id: int):
+def bot_train(bot_id: int) -> Union[render_template, redirect]:
+    """
+    This function handles the training process for a specific bot. It retrieves the bot's details from the database,
+    and renders a template for training parameters or executes the training process based on user input.
+
+    Parameters:
+    - bot_id (int): The unique identifier of the bot to be trained.
+
+    Returns:
+    - render_template: If the request method is 'GET', this function renders the 'bot_train.html' template with the bot's details and technical indicators.
+    - redirect: If the request method is 'POST', this function redirects the user to the bot's detail page after starting the training process in a separate thread.
+    """
     bot = postgres_db.get_bot_by_id(bot_id)
     if request.method == 'GET':
         indicators = bot[8].split(',')
         return render_template('bot_train.html', user=current_user, bot=bot, indicators=indicators)
     elif request.method == 'POST':
-        # TODO Write a function which actually trains the model after all user inputs
         params: dict = request.form.to_dict()
         start_time: datetime.datetime = datetime.datetime.strptime(params['startTime'], '%Y-%m-%dT%H:%M')
         end_time: datetime.datetime = datetime.datetime.strptime(params['endTime'], '%Y-%m-%dT%H:%M')
@@ -42,7 +83,7 @@ def bot_train(bot_id: int):
             data_percentage = 1
         else:
             data_percentage = float(params['dataPercentage']) / 100
-            
+
         # TODO get model specific data such us batch size and epochs from the request
         bot_train_thread_args = (
             current_user.get_id(),
@@ -53,9 +94,10 @@ def bot_train(bot_id: int):
         )
         bot_train_thread = threading.Thread(target=bot_train_execute, args=bot_train_thread_args)    
         bot_train_thread.start()
-            
+
         return redirect(f'/bot/{bot[0]}')
-    
+
+
 def bot_train_execute(user: int, bot: list, start_time: datetime.datetime, end_time: datetime.datetime, data_percentage: float) -> None:
     """
     This function is responsible for executing the training process for a specific bot and is called by a separate thread.
@@ -77,14 +119,14 @@ def bot_train_execute(user: int, bot: list, start_time: datetime.datetime, end_t
         value=True,
         where_condition=f'WHERE "user"={user} AND "id"={bot[0]}'
     )
-    
+
     postgres_db.update_table(
         table_name='bots',
         column='training_set_percentage',
         value=data_percentage,
         where_condition=f'WHERE "user"={user} AND "id"={bot[0]}'
     )
-    
+
     if bot[7].lower() == 'xgboost':
         xgbmodel = XGBoostModel()
         # TODO get hyper parameters from database
@@ -97,9 +139,9 @@ def bot_train_execute(user: int, bot: list, start_time: datetime.datetime, end_t
             end_date=end_time,
             train_size=data_percentage
             )
-        
+
     # Add other model types here
-    
+
     postgres_db.update_table(
         table_name='bots',
         column='last_trained',
@@ -117,35 +159,102 @@ def bot_train_execute(user: int, bot: list, start_time: datetime.datetime, end_t
 
 @login_required
 @endpoint.route('/bot/<int:bot_id>')
-def bot(bot_id: int):
+def bot(bot_id: int) -> render_template:
+    """
+    This function retrieves and displays the details of a specific bot.
+
+    Parameters:
+    - bot_id (int): The unique identifier of the bot. This parameter is expected to be an integer.
+
+    Returns:
+    - render_template: A Flask function that renders a template with the provided arguments.
+        - 'bot.html': The name of the template file to render.
+        - user: The current user object.
+        - bot: A list containing information about the bot, including its ID, model type, etc.
+
+    This function is decorated with @login_required, which ensures that only authenticated users can access this route.
+    The bot's details are retrieved from the database using the provided bot_id and then rendered in the 'bot.html' template.
+    """
     bot = postgres_db.get_bot_by_id(bot_id)
     return render_template('bot.html', user=current_user, bot=bot)
 
+
 @login_required
 @endpoint.route('/delete_bot/<int:bot_id>')
-def bot_delete(bot_id: int):
-    # TODO Check if bot is running before deleting
+def bot_delete(bot_id: int) -> redirect:
+    """
+    Deletes a bot from the database based on the provided bot ID.
+
+    Parameters:
+    - bot_id (int): The unique identifier of the bot to be deleted. This parameter is expected to be an integer.
+
+    Returns:
+    - redirect: A Flask function that redirects the user to a different URL.
+        - '/bot_overview': The URL to redirect the user to after successfully deleting the bot.
+
+    Note:
+    - This function is decorated with @login_required, which ensures that only authenticated users can access this route.
+    - Before deleting the bot, a TODO comment suggests checking if the bot is currently running. This functionality is not implemented in the provided code.
+    """
     postgres_db.delete_bot_by_id(bot_id)
     return redirect('/bot_overview')
 
+
 @login_required
-@endpoint.route('/bot_overview', methods=['GET', 'POST'])
+@endpoint.route('/bot_overview', methods=['GET'])
 def bot_overview():
+    """
+    This function handles the display of all bots owned by the current user.
+    It retrieves the list of bots from the database and renders a template with the bot details.
+
+    Parameters:
+    - request: A Flask request object containing information about the HTTP request.
+        - method: The HTTP method used for the request. In this case, it should be 'GET'.
+
+    Returns:
+    - render_template: A Flask function that renders a template with the provided arguments.
+        - 'bot_overview.html': The name of the template file to render.
+        - user: The current user object.
+        - bots: A list of dictionaries, where each dictionary represents a bot owned by the current user.
+            Each bot dictionary contains information such as 'id', 'name', 'symbol', 'timeframe', 'model_type', etc.
+
+    Note:
+    - This function is decorated with @login_required, which ensures that only authenticated users can access this route.
+    - The function checks the HTTP method of the request. If it is 'GET', it retrieves the list of bots from the database
+      and renders the 'bot_overview.html' template with the bot details.
+    """
     if request.method == 'GET':
         bots = postgres_db.get_all_bots_by_user(current_user.get_id())
         return render_template('bot_overview.html', user=current_user, bots=bots)
 
+
 @login_required
 @endpoint.route('/bot_creation', methods=['GET', 'POST'])
 def bot_creation():
+    """
+    Handles the creation of a new bot. It processes both GET and POST requests.
+    For GET requests, it renders the bot creation form.
+    For POST requests, it processes the form data and creates a new bot in the database.
+
+    Parameters:
+    - request: A Flask request object containing information about the HTTP request.
+        - method: The HTTP method used for the request. In this case, it should be either 'GET' or 'POST'.
+
+    Returns:
+    - render_template: A Flask function that renders a template with the provided arguments.
+        - 'bot_creation.html': The name of the template file to render.
+        - user: The current user object.
+    - redirect: A Flask function that redirects the user to a different URL.
+        - '/bot_overview': The URL to redirect the user to after successfully creating a new bot.
+    """
     if request.method == 'GET':
         return render_template('bot_creation.html', user=current_user)
     if request.method == 'POST':
         params: dict = request.form.to_dict()
-        
+
         technical_indicators: list[str] = [params.get(key) for key in params.keys() if 'technical_indicator' in key]
         technical_indicators: str = ','.join(technical_indicators)
-        
+
         if params.get('hyperparamCheckbox') != 'on':
             hyper_parameters: dict = {
                 "num_trees" : params.get('num_trees') if params.get('num_trees') else None,
@@ -157,9 +266,9 @@ def bot_creation():
             hyper_parameters = json.dumps(hyper_parameters)
         else:
             hyper_parameters = json.dumps({})
-            
+
         new_id = postgres_db.provide_unique_id('bots')
-        
+
         postgres_db.insert_new_bot(
             new_id=new_id,
             user=current_user.get_id(),
@@ -170,8 +279,9 @@ def bot_creation():
             technical_indicators=technical_indicators,
             hyper_parameters=hyper_parameters
         )
-        
+
         return redirect('/bot_overview')
+
 
 @endpoint.route('/dashboard')
 def dashboard():
@@ -266,7 +376,7 @@ def sign_up():
         password2 = request.form.get('password2')
 
         user = User.query.filter_by(email=email).first()
-        
+
         # TODO Make this checks more meaningful 
         if user:
             flash('Email already exists.', category='error')

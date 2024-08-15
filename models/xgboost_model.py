@@ -99,7 +99,6 @@ class XGBoostModel(ModelBase):
         model.set_params(**params)
         return model
     
-    # TODO Function to create model from the database
     
     def train(self, user: int, model_id: int, model: xgb.XGBClassifier, start_date: datetime.datetime, end_date: datetime.datetime, train_size: float) -> None:
         """
@@ -154,5 +153,3 @@ class XGBoostModel(ModelBase):
     def predict(self, model, features: pd.DataFrame):
         # TODO Error handling
         return model.predict(features)
-        
-    # TODO Function for calculating error metrics

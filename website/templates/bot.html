@@ -7,7 +7,6 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bot.css') }}">
     <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="{{ url_for('static', filename='js/bot.js') }}"></script>
 </head>
@@ -39,7 +38,7 @@
                 <ul>
                     <li><strong>Name:</strong> {{ bot[2] }}</li>
                     <li><strong>Model Type:</strong> {{ bot[7] }}</li>
-                    <li id="currently-training"><strong>Currently Training:</strong> <span id="training-status-value">{{ bot[11] }}</span><span id="loading-animation" class="hidden"></span></li>
+                    <li id="currently-training"><strong>Currently Training:</strong> <span id="training-status-value">{{ bot[10] }}</span><span id="loading-animation" class="hidden"></span></li>
                     <li id="lastTrained"><strong>Last Trained:</strong> {{ bot[4] }}</li>
                     <li><strong>Overall Performance:</strong></li>
                     <li><strong>Current Prediction:</strong></li>
@@ -202,6 +201,7 @@
         window.onload = function() {
             checkTrainingStatus(user, bot_id);
             checkLastTrained(user, bot_id);
+            checkBotRunning(user, bot_id);
         }
 
         const ctx = document.getElementById('priceGraph').getContext('2d');
@@ -281,15 +281,68 @@
             }
         });
 
-        function toggleBot() {
+        function checkBotRunning(user, bot_id){
             const button = document.getElementById('startStopBot');
+            var bot_running;
+            const url = '/api/bot_is_running/' + user + '/' + bot_id;
+            $.ajax({
+                url: url,
+                type: 'GET',
+                data: {
+                    user: user,
+                    bot_id: bot_id
+                },
+                success: function(response) {
+                    response = $.parseJSON(response);
+                    bot_running = response['running'];
+
+                    if (bot_running === 'True') {
+                        button.textContent = 'Stop Bot';
+                        button.style.backgroundColor = '#DC3545';
+                    } else {
+                        button.textContent = 'Start Bot';
+                        button.style.backgroundColor = '#4BC0C0';
+                    }
+                    console.error('THIS IS THE END');
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error checking if bot is running:', error);
+                }
+            })
+        }
+
+        function toggleBot() {
+            var user = '{{ user.get_id() }}';
+            var bot_id = '{{ bot[0] }}';
+            const button = document.getElementById('startStopBot');
+
             if (button.textContent === 'Start Bot') {
                 button.textContent = 'Stop Bot';
                 button.style.backgroundColor = '#DC3545';
+                var action = 'True';
             } else {
                 button.textContent = 'Start Bot';
                 button.style.backgroundColor = '#4BC0C0';
+                var action = 'False';
             }
+
+            const url = '/start_stop_bot/' + user + '/' + bot_id + '/' + action;
+            $.ajax({
+                url: url,
+                type: 'GET',
+                data: {
+                    user: user,
+                    bot_id: bot_id,
+                    action: action
+                },
+                success: function(response) {
+
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error starting / stopping bot:', error);
+                    console.error(url);
+                }
+            })
         }
     </script>
 </body>

@@ -14,6 +14,8 @@ api = Blueprint('api', __name__)
 
 postgres_db = Database()
 
+# TODO Include a check if the user who send the request is allowed to execute the method for the requested bot
+
 @login_required
 @api.route('/api/chart_data')
 def chart_data() -> dict:
@@ -95,8 +97,24 @@ def get_bot_training_error_metrics(user: int, bot_id: int) -> dict:
     """
     query_result: dict = postgres_db.get_training_error_metrics(user=user, model_id=bot_id)
     result = json.dumps(query_result)
-    print('-'*100)
-    print(query_result)
-    print(result)
-    print('-'*100)
     return result
+
+@login_required
+@api.route('api/bot_is_running/<int:user>/<int:bot_id>')
+def bot_is_running(user: int, bot_id: int) -> str:
+    """
+    This function checks if a specific bot for a given user is currently running in a PostgreSQL database.
+
+    Parameters:
+    - user (int): The unique identifier of the user. This parameter is used to identify the user in the database.
+    - bot_id (int): The unique identifier of the bot. This parameter is used to identify the bot in the database.
+
+    Returns:
+    - str: A JSON string representing the running status of the bot.
+    The JSON string contains a single key-value pair: 'running', which holds the running status (True or False).
+    """
+    # TODO Error handling
+    query: str = f'SELECT running FROM bots WHERE "user"={user} AND "id"={bot_id}'
+    query_result = postgres_db.execute_read_query(query, return_type='pd.DataFrame')
+    result: dict = {'running': str(query_result['running'].iloc[0])}
+    return json.dumps(result)

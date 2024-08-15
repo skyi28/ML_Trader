@@ -2,7 +2,6 @@
 This python module contains functions create, train and predict utilizing a xgboost model.
 """
 import os
-import sys
 basedir = os.path.abspath(os.path.dirname(__file__)) + os.sep
 basedir_split = basedir.split(os.sep)
 path_to_config = ''
@@ -12,10 +11,10 @@ for part in basedir_split:
         path_to_config += f'{os.sep}config'
         break
 
+import numpy as np
 import pandas as pd
 import datetime
 import xgboost as xgb
-from sklearn.metrics import confusion_matrix
 import json
 
 from config.config import load_config
@@ -27,6 +26,9 @@ from models.model_base import ModelBase
 from models.prepare_training_data import PrepareTrainingData
 
 class XGBoostModel(ModelBase):
+    """
+    Implementation of XGBoost model for predicting the direction in which the price of a crypto currency will develop. Inherits from ModelBase.
+    """
     def __init__(self) -> None:
         """
         Initialize the XGBoostModel class with the provided id.
@@ -150,6 +152,18 @@ class XGBoostModel(ModelBase):
         
         return model
     
-    def predict(self, model, features: pd.DataFrame):
+    def predict(self, model, features: pd.DataFrame) -> np.ndarray:
+        """
+        This function uses a trained model to predict the target values for the given features.
+
+        Parameters:
+        - model (xgb.XGBClassifier | xgb.XGBRegressor): The trained model to be used for prediction.
+        - features (pd.DataFrame): A pandas DataFrame containing the features for which predictions are to be made.
+                                The DataFrame should have the same columns as the features used during training.
+
+        Returns:
+        - np.ndarray: An array containing the predicted target values for the given features.
+                    The shape of the array will be (n_samples,) where n_samples is the number of samples in the input features.
+        """
         # TODO Error handling
         return model.predict(features)

@@ -1,3 +1,7 @@
+"""
+This file contains all endpoints which return visible output. All routes which return data to the 
+user are defined in api.py. 
+"""
 from flask import Blueprint, render_template, redirect, flash, request, url_for, jsonify
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -5,7 +9,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import json
 import threading
 import datetime
-import time
 
 from website.user import User
 from website.app import db
@@ -33,10 +36,6 @@ def favicon():
     return url_for('static', filename='images/favicon.ico')
 
 
-@endpoint.route('/')
-def index():
-    return f'Hello World'
-
 @endpoint.route('/start_stop_bot/<int:user>/<int:bot_id>/<string:action>')
 def start_stop_bot(user: int, bot_id: int, action: str) -> dict:
     """
@@ -59,7 +58,7 @@ def start_stop_bot(user: int, bot_id: int, action: str) -> dict:
     return jsonify(success=True)
 @login_required
 @endpoint.route('/train/<int:bot_id>', methods=['GET', 'POST'])
-def bot_train(bot_id: int) -> Union[render_template, redirect]:
+def bot_train(bot_id: int) -> render_template | redirect:
     """
     This function handles the training process for a specific bot. It retrieves the bot's details from the database,
     and renders a template for training parameters or executes the training process based on user input.

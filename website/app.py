@@ -1,3 +1,6 @@
+"""
+Creates a flask application.
+"""
 import os
 basedir = os.path.abspath(os.path.dirname(__file__)) + os.sep
 basedir_split = basedir.split(os.sep)
@@ -5,7 +8,7 @@ path_to_config = ''
 for part in basedir_split:
     path_to_config += part + os.sep
     if part == "ML_Trader":
-        path_to_config += f'\config'
+        path_to_config += f'{os.sep}config'
         break
     
 from flask import Flask

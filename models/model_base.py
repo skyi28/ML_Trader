@@ -19,9 +19,27 @@ from config.config import load_config
 from infrastructure.database import Database
 
 class ModelBase():
+    """
+    Base class for all model-related operations. Contains several functions which are necessary for all models.
+    """
     def __init__(self, db, config) -> None:
+        """
+        Initializes a new instance of the ModelBase class.
+
+        This constructor takes two parameters: a Database object (db) and a Config object (config).
+        The Database object provides methods for interacting with the database, while the Config object
+        contains configuration settings for the application.
+
+        Parameters:
+        - db (Database): An instance of the Database class, which provides methods for interacting with the database.
+        - config (Config): An instance of the Config class, which contains configuration settings for the application.
+
+        Returns:
+        - None: The constructor does not return any value. It initializes the ModelBase instance with the provided db and config objects.
+        """
         self.db = db
         self.config = config
+
 
     def get_model_params_from_database(self, user: int, model_id: int) -> dict:
         """
@@ -72,13 +90,42 @@ class ModelBase():
         return symbol.lower()
 
     def save_model(self, model, user: int, model_id: int) -> None:
+        """
+        Saves a trained model to a specified location in the filesystem.
+
+        The function constructs the path to the model file based on the user and model ID,
+        then uses the pickle module to serialize the model and save it to the filesystem.
+
+        Parameters:
+        - model: The trained model object to be saved.
+        - user (int): The unique identifier of the user who owns the model.
+        - model_id (int): The unique identifier of the model.
+
+        Returns:
+        - None: The function does not return any value.
+        """
         path_to_model: str = self.config.path_to_models.replace(f'{os.sep}config','')
         pickle.dump(model, open(f'{path_to_model}model_{user}_{model_id}.pkl', 'wb'))
 
-    def load_model(self, user: int, model_id: int):
+
+    def load_model(self, user: int, model_id: int) -> object:
+        """
+        Loads a trained model from the filesystem based on the provided user and model ID.
+
+        The function constructs the path to the model file based on the user and model ID,
+        then uses the pickle module to deserialize the model and return it.
+
+        Parameters:
+        - user (int): The unique identifier of the user who owns the model.
+        - model_id (int): The unique identifier of the model.
+
+        Returns:
+        - object: The loaded trained model object.
+        """
         path_to_model: str = self.config.path_to_models.replace(f'{os.sep}config','')
         model = pickle.load(open(f'{path_to_model}model_{user}_{model_id}.pkl', 'rb'))
         return model
+
 
     def create_confusion_matrix(self, y_test: np.array, y_pred: np.array) -> np.array:
         """

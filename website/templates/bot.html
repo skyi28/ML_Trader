@@ -38,10 +38,26 @@
                     <li><strong>Name:</strong> {{ bot[2] }}</li>
                     <li><strong>Model Type:</strong> {{ bot[7] }}</li>
                     <li id="currently-training"><strong>Currently Training:</strong> <span id="training-status-value">{{ bot[11] }}</span><span id="loading-animation" class="hidden"></span></li>
-                    <li><strong>Last Trained:</strong> {{ bot[4] }}</li>
+                    <li id="lastTrained"><strong>Last Trained:</strong> {{ bot[4] }}</li>
                     <li><strong>Overall Performance:</strong></li>
                     <li><strong>Current Prediction:</strong></li>
                 </ul>
+            </div>
+            <!-- Training Metrics Section -->
+            <div class="training-metrics-section" id="training-metrics-section">
+                <h2>Training Metrics</h2>
+                <div class="metric">
+                    <h3>Confusion Matrix</h3>
+                    <ul>
+                        <li>If 100% of the data were used for training in the last training run, the following values are determined by using the training set.</li>
+                    </ul>
+                    <!-- Placeholder for the confusion matrix; replace with actual content -->
+                    <div id="confusion-matrix">
+                        Here is the confusion matrix.
+                        <!-- Add your confusion matrix content here -->
+                    </div>
+                </div>
+                <!-- Add more metrics as needed -->
             </div>
             <div class="trades-section">
                 <h2>Last Trades</h2>
@@ -78,7 +94,10 @@
         // Start checking training status when the page loads
         var user = '{{ user.get_id() }}';
         var bot_id = '{{ bot[0] }}';
-        window.onload = checkTrainingStatus(user, bot_id);
+        window.onload = function() {
+            checkTrainingStatus(user, bot_id);
+            checkLastTrained();
+        }
 
         const ctx = document.getElementById('priceGraph').getContext('2d');
 
@@ -165,9 +184,11 @@
             if (button.textContent === 'Start Bot') {
                 button.textContent = 'Stop Bot';
                 button.style.backgroundColor = '#DC3545'; // Red for stop
+                // TODO call method which starts the bot
             } else {
                 button.textContent = 'Start Bot';
                 button.style.backgroundColor = '#4BC0C0'; // Original color for start
+                // TODO call method which stops the bot
             }
         }
 

@@ -78,6 +78,13 @@ def bot_train_execute(user: int, bot: list, start_time: datetime.datetime, end_t
         where_condition=f'WHERE "user"={user} AND "id"={bot[0]}'
     )
     
+    postgres_db.update_table(
+        table_name='bots',
+        column='training_set_percentage',
+        value=data_percentage,
+        where_condition=f'WHERE "user"={user} AND "id"={bot[0]}'
+    )
+    
     if bot[7].lower() == 'xgboost':
         xgbmodel = XGBoostModel(bot[0])
         # TODO get hyper parameters from database
@@ -92,8 +99,6 @@ def bot_train_execute(user: int, bot: list, start_time: datetime.datetime, end_t
             )
         
     # Add other model types here
-    # TODO DELETE
-    time.sleep(5)
     
     postgres_db.update_table(
         table_name='bots',

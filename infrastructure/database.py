@@ -434,7 +434,7 @@ class Database:
         self.execute_write_query(query)
         self.commit()
         
-    def save_model(self, user, model_id, model) -> None:
+    def save_model(self, user: int, model_id: int, model) -> None:
         """
         Saves a trained model to the 'bots' table in the PostgreSQL database.
 
@@ -450,7 +450,7 @@ class Database:
         self.execute_write_query(query, (model,))
         self.commit()
         
-    def load_model(self, user, model_id):
+    def load_model(self, user: int, model_id: int):
         """
         Retrieves and loads a trained model from the 'bots' table in the PostgreSQL database.
 
@@ -464,3 +464,17 @@ class Database:
         query: str = f"SELECT pickled FROM bots WHERE user={user} AND id={model_id}"
         model = self.execute_read_query(query, first_only=True)[0]
         return model
+    
+    def insert_training_error_metrics(self, user: int, model_id: int, metrics: dict) -> None:
+        for key in metrics.keys():
+            try:
+                self.update_table(
+                    table_name='bots',
+                    column=key,
+                    value=metrics[key],
+                    where_condition=f'WHERE "user"={user} AND "id"={model_id}'
+                )
+            except Exception as e:
+                self.logger.error(f'insert_training_error_metrics: Error inserting training error metric {key}: {str(e)} for user {user} and model {model_id}')
+        self.commit()
+    

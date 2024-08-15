@@ -192,7 +192,7 @@ button:hover {
     border-radius: 10px;
     padding: 20px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
-    margin-bottom: 10px; /* Add space below this section */
+    /* margin-bottom: 10px; */
 }
 
 .bot-info-section h2 {
@@ -235,6 +235,32 @@ button:hover {
 /* Utility class to hide elements */
 .hidden {
     display: none;
+}
+
+.training-metrics-section {
+    background-color: #011627;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+    /* margin-bottom: 10px; */
+}
+
+.training-metrics-section h2 {
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.metric {
+    margin-bottom: 20px; /* Space between metrics */
+}
+
+#confusion-matrix {
+    /* Style for confusion matrix; customize as needed */
+    color: #ffffff;
+    background-color: #1e2a38;
+    padding: 10px;
+    border-radius: 5px;
+    overflow: auto;
 }
 
 #sidebar_dots {

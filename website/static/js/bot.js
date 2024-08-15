@@ -37,3 +37,15 @@ function checkTrainingStatus(user, bot_id) {
     // Set the interval to call fetchStatus every second
     const intervalId = setInterval(fetchStatus, 1000); // TODO Change interval to 1000ms
 }
+
+function checkLastTrained(){
+    const lastTrainedValue = document.getElementById('lastTrained').textContent;
+    console.log("LastTrainedValue" + lastTrainedValue);
+    if (lastTrainedValue.toLowerCase().includes('None'.toLowerCase())) {
+        console.log("LastTrainedValue includes None --> set to hidden")
+        document.getElementById('training-metrics-section').style.display = 'none';
+    } else {
+        console.log("LastTrainedValue does not include None --> set to visible")
+        document.getElementById('training-metrics-section').style.display = 'initial';
+    }
+}

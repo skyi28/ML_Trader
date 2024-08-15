@@ -15,7 +15,8 @@ for part in basedir_split:
 import pandas as pd
 import datetime
 import xgboost as xgb
-import pickle
+from sklearn.metrics import confusion_matrix
+import json
 
 from config.config import load_config
 
@@ -120,15 +121,35 @@ class XGBoostModel(ModelBase):
         
         data = self.ptd.load_data(symbol, feature_columns=technical_indicators, min_date=start_date, max_date=end_date)
         data = data.pipe(self.ptd.remove_na).pipe(self.ptd.remove_timestamp).pipe(self.ptd.add_return).pipe(self.ptd.add_direction, remove_zeros=True)
-        features, target = self.ptd.create_features_and_targets(data)        
+        features, target = self.ptd.create_features_and_targets(data)
+        
+        if train_size != 1:
+            features_train, target_train, features_test, target_test = self.ptd.create_training_and_testing_set(features, target, train_size)   
+        else:
+            features_train = features
+            target_train = target 
+            features_test = features
+            target_test = target
                 
-        model.fit(features, target)
+        model.fit(features_train, target_train)
+        pred = self.predict(model, features_test)
+        
+        confusion_matrix: list = self.create_confusion_matrix(target_test, pred).tolist()
+        confusion_matrix: dict = json.dumps(confusion_matrix)
+        
+        # Make sure that the keys of the metrics dict match the column names in the database
+        metrics: dict = {
+            'confusion_matrix': confusion_matrix,
+            'accuracy': self.calc_accuracy(target_test, pred),
+            'balanced_accuracy': self.calc_balanced_accuracy(target_test, pred),
+            'precision': self.calc_precision(target_test, pred),
+            'recall': self.calc_recall(target_test, pred)
+        }
+        
+        self.db.insert_training_error_metrics(user=user, model_id=model_id, metrics=metrics)
         
         self.save_model(model, user, model_id)
-    
-    def train_old(self, model, features: pd.DataFrame, target: pd.Series):
-        # TODO Error handling
-        model.fit(features, target)
+        
         return model
     
     def predict(self, model, features: pd.DataFrame):

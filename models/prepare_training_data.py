@@ -177,4 +177,35 @@ class PrepareTrainingData:
         target = data.loc[:, target_column]
         return features, target
     
+    def create_training_and_testing_set(self, features: pd.DataFrame, target: pd.Series, train_size: float) -> tuple:
+        """
+        This function splits the input features and target data into training and testing sets based on the specified train_size.
+
+        Parameters:
+        - features (pd.DataFrame): A pandas DataFrame containing the features for the machine learning model.
+        - target (pd.Series): A pandas Series containing the target variable for the machine learning model.
+        - train_size (float): A float value between 0 and 1 representing the proportion of the data to include in the training set.
+
+        Returns:
+        - tuple: A tuple containing four elements:
+            - train_features (pd.DataFrame): The training set of features.
+            - train_target (pd.Series): The training set of target values.
+            - test_features (pd.DataFrame): The testing set of features.
+            - test_target (pd.Series): The testing set of target values.
+        If train_size is 1, the function returns the entire features and target data as the training set, and None for the testing set.
+        """
+        if train_size == 1:
+            return features, target, None, None
+
+        split_index: int = int(len(features) * train_size)
+
+        train_features: pd.DataFrame = features.loc[:split_index, :]
+        train_target: pd.Series = target.loc[:split_index]
+
+        test_features: pd.DataFrame = features.loc[split_index:, :]
+        test_target: pd.Series = target.loc[split_index:]
+
+        return train_features, train_target, test_features, test_target
+
+    
     # TODO Data preperation for other models

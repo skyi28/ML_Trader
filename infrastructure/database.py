@@ -352,7 +352,7 @@ class Database:
         self.execute_write_query(query, (value,))
         self.commit()
 
-    def provide_unique_id(self, table: str) -> int:
+    def provide_unique_id(self, table: str, id_column_name: str = 'id') -> int:
         """
         This function retrieves the highest ID from a specified table in the PostgreSQL database and returns the next unique ID.
         If the table is empty, it returns 1 as the first unique ID.
@@ -364,13 +364,13 @@ class Database:
         - int: The next unique ID for the specified table. If an error occurs during the process, it returns 0 as the default value.
         """
         try:
-            new_id = self.execute_read_query(f'SELECT "id" FROM "{table}" ORDER BY "id" DESC LIMIT(1)', first_only=True)[0] + 1
+            new_id = self.execute_read_query(f'SELECT "{id_column_name}" FROM "{table}" ORDER BY "{id_column_name}" DESC LIMIT(1)', first_only=True)[0] + 1
         except Exception as e:
-            self.logger.error(f'provide_unique_id: Error fetching the highest ID: {str(e)}')
+            self.logger.error(f'provide_unique_id: Error fetching the highest ID: {str(e)} Returning 0 as new id!')
             new_id = 0  # default value if an error occurs
         return new_id
     
-    def insert_new_bot(self, new_id: int, user: int, name:str, symbol: str, timeframe: int, model_type: str, technical_indicators: str, hyper_parameters: dict) -> None:
+    def insert_new_bot(self, new_id: int, user: int, name:str, symbol: str, timeframe: int, model_type: str, technical_indicators: str, hyper_parameters: dict, money: float) -> None:
         """
         Inserts a new bot into the 'bots' table in the PostgreSQL database.
 
@@ -382,13 +382,14 @@ class Database:
         - model_type (str): The type of the bot (e.g., machine learning algorithm).
         - technical_indicators (str): The technical indicators used in the bot.
         - hyper_parameters (json): The hyperparameters of the bot.
+        - money (float): The amount of money the bot can use.
 
         Returns:
         - None: The function does not return any value. It inserts a new bot into the database.
         """
-        query: str = 'INSERT INTO bots (id, "user", name, created, last_trained, symbol, timeframe, model_type, technical_indicators, hyper_parameters, training, running, "position")'
-        query += f" VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        self.execute_write_query(query, (new_id, user, name, datetime.datetime.now(), None, symbol, timeframe, model_type, technical_indicators.lower(), hyper_parameters, None, False, 'neutral'))
+        query: str = 'INSERT INTO bots (id, "user", name, created, last_trained, symbol, timeframe, model_type, technical_indicators, hyper_parameters, training, running, "position", money)'
+        query += f" VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        self.execute_write_query(query, (new_id, user, name, datetime.datetime.now(), None, symbol, timeframe, model_type, technical_indicators.lower(), hyper_parameters, None, False, 'neutral', money))
         self.commit()
         
     def get_all_bots_by_user(self, user_id: int):
@@ -466,7 +467,6 @@ class Database:
         Returns:
         - dict: A dictionary containing the training error metrics for the specified bot.
         """
-        # TODO error handling
         query: str = f'SELECT training_error_metrics FROM bots WHERE "user"={user} AND "id"={model_id}'
         data = self.execute_read_query(query)
         return data[0][0]
@@ -503,3 +503,32 @@ class Database:
         query: str = 'SELECT "user", "id", model_type, symbol, technical_indicators, position, entry_price, prediction FROM bots WHERE running=True'
         data = self.execute_read_query(query, return_type='pd.DataFrame')
         return data
+    
+    def insert_trade(self, user: int, bot_id: int, timestamp: datetime.datetime, symbol: str, side: str, entry_price: float, close_price: float, money: float, profit_abs: float, profit_rel: float, trading_fee: float, tp_trigger: bool, sl_trigger: bool) -> None:
+        """
+        Inserts a new trade into the 'trades' table in the PostgreSQL database.
+
+        Parameters:
+        - user (int): The unique identifier of the user who initiated the trade.
+        - bot_id (int): The unique identifier of the bot that made the trade.
+        - timestamp (datetime.datetime): The timestamp of the trade.
+        - symbol (str): The symbol of the financial instrument involved in the trade.
+        - side (str): The side of the trade ('buy' or 'sell').
+        - entry_price (float): The price at which the trade was initiated.
+        - close_price (float): The price at which the trade was closed.
+        - profit_abs (float): The absolute profit or loss made on the trade.
+        - profit_rel (float): The relative profit or loss made on the trade, expressed as a percentage.
+        - trading_fee (float): The trading fee associated with the trade.
+        - tp_trigger (bool): A boolean indicating whether the trade was triggered by a take-profit order.
+        - sl_trigger (bool): A boolean indicating whether the trade was triggered by a stop-loss order.
+
+        Returns:
+        - None: The function does not return any value. It inserts a new trade into the database.
+        """
+        trade_id: int = self.provide_unique_id('trades', id_column_name='trade_id')
+        
+        query: str = 'INSERT INTO trades (trade_id, "user", bot_id, timestamp, symbol, side, entry_price, close_price, money, profit_abs, profit_rel, trading_fee, tp_trigger, sl_trigger) VALUES ('
+        query += ' %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+        self.execute_write_query(query, (trade_id, user, bot_id, timestamp, symbol, side, entry_price, close_price, money, profit_abs, profit_rel, trading_fee, tp_trigger, sl_trigger))
+        self.commit()
+        

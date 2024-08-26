@@ -37,7 +37,7 @@ logger.info('Starting ML Trader...')
 logger.info(f'Loading config.yaml from {path_to_config}{os.sep}config{os.sep}config.yaml')
 config = load_config(f'{path_to_config}{os.sep}config{os.sep}config.yaml')
 
-# TODO Execute cmd commands to start the database
+# Execute cmd commands to start the database
 change_dir_command: str = f'cd {config.postgres.path_to_postgres}{os.sep}bin'
 start_postgres_command: str = f'.{os.sep}pg_ctl.exe start -D "A:{os.sep}PostgreSQL{os.sep}16{os.sep}data"' # Replace this with path_to_postgres
 logger.info(f'Starting postgres...')
@@ -78,7 +78,10 @@ data_thread.start()
 db.create_table('"user"', ['id INT','email VARCHAR','password VARCHAR','first_name VARCHAR','last_name VARCHAR'], primary_keys=['id'])
 
 # Create bots table
-db.create_table('bots', ['id INT', '"user" INT', 'name VARCHAR', 'created TIMESTAMP', 'last_trained TIMESTAMP', 'symbol VARCHAR', 'timeframe INT', 'model_type VARCHAR', 'technical_indicators VARCHAR', 'hyper_parameters JSON', 'training BOOL', 'training_set_percentage FLOAT', 'training_error_metrics JSON', 'running BOOL', 'prediction FLOAT', 'position VARCHAR', 'entry_price FLOAT'], primary_keys=['id'])
+db.create_table('bots', ['id INT', '"user" INT', 'name VARCHAR', 'created TIMESTAMP', 'last_trained TIMESTAMP', 'symbol VARCHAR', 'timeframe INT', 'model_type VARCHAR', 'technical_indicators VARCHAR', 'hyper_parameters JSON', 'training BOOL', 'training_set_percentage FLOAT', 'training_error_metrics JSON', 'running BOOL', 'prediction FLOAT', 'position VARCHAR', 'entry_price FLOAT', 'money FLOAT'], primary_keys=['id'])
+
+# Create trades table
+db.create_table('trades', ['trade_id INT', '"user" INT', 'bot_id INT', '"timestamp" TIMESTAMP', 'symbol VARCHAR', 'side VARCHAR', 'entry_price FLOAT', 'close_price FLOAT', 'money FLOAT', 'profit_abs FLOAT', 'profit_rel FLOAT', 'trading_fee FLOAT', 'tp_trigger BOOL', 'sl_trigger BOOL'], primary_keys=['trade_id'])
 
 logger.info('Starting model prediction thread')
 db.execute_write_query("UPDATE bots SET position='neutral'")

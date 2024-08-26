@@ -19,7 +19,7 @@ webserver:
   debug_mode: False
 
 tradeable_symbols: ["BTCUSD","ETHUSD"]
-trading_fees: 0.00 / 100 # 0.06 / 100 # Lookup trading fees on Bybit
+trading_fees: 0.00 # No calculation can be performed here | #TODO Lookup trading fees on Bybit
 
 price_update_interval: 15
 

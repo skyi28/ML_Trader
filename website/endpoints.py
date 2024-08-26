@@ -58,7 +58,7 @@ def start_stop_bot(user: int, bot_id: int, action: str) -> dict:
     return jsonify(success=True)
 @login_required
 @endpoint.route('/train/<int:bot_id>', methods=['GET', 'POST'])
-def bot_train(bot_id: int) -> render_template | redirect:
+def bot_train(bot_id: int):
     """
     This function handles the training process for a specific bot. It retrieves the bot's details from the database,
     and renders a template for training parameters or executes the training process based on user input.
@@ -276,7 +276,8 @@ def bot_creation():
             timeframe=int(request.form.get('time_frame')),
             model_type=request.form.get('ml_model'),
             technical_indicators=technical_indicators,
-            hyper_parameters=hyper_parameters
+            hyper_parameters=hyper_parameters,
+            money=request.form.get('money')
         )
 
         return redirect('/bot_overview')

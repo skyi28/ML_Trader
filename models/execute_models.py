@@ -1,5 +1,6 @@
 """
 This python module contains functions needed to let all running models make predictions.
+# TODO Error handling --> if error close position? Maybe make it configurable...
 """
 import os
 basedir = os.path.abspath(os.path.dirname(__file__)) + os.sep
@@ -35,8 +36,9 @@ class ExecuteModels:
         - None
         """
         self.config = load_config(f'{path_to_config}{os.sep}config.yaml')
-        self.db = Database()
-        self.ptd = PrepareTrainingData()
+        self.db: Database = Database()
+        self.ptd: PrepareTrainingData = PrepareTrainingData()
+        self.TRADING_FEE: float = float(self.config.trading_fees)
         
     def prediction_loop(self) -> None:
         """
@@ -191,11 +193,27 @@ class ExecuteModels:
         - None
         """
         if closing_position == 'long':
-            profit_abs: float = close_price - row['entry_price']
-            profit_rel: float = profit_abs / row['entry_price']
+            profit_abs: float = close_price - row['entry_price'] # TODO Calculate absolute profit which includes trading fees
+            profit_rel: float = float(profit_abs / row['entry_price']) - self.TRADING_FEE 
         elif closing_position == 'short':
-            profit_abs: float = row['entry_price'] - close_price
-            profit_rel: float = profit_abs / row['entry_price']
+            profit_abs: float = row['entry_price'] - close_price # TODO Calculate absolute profit which includes trading fees
+            profit_rel: float = float(profit_abs / row['entry_price']) - self.TRADING_FEE
+            
+        self.db.insert_trade(
+            user=row['user'],
+            bot_id=row['id'],
+            timestamp=datetime.datetime.now(),
+            symbol=row['symbol'],
+            side=closing_position,
+            entry_price=row['entry_price'],
+            close_price=close_price,
+            money=100, # TODO Update money
+            profit_abs=profit_abs,
+            profit_rel=profit_rel,
+            trading_fee=self.TRADING_FEE,
+            tp_trigger=False, # TODO Update when TP/SL was triggered
+            sl_trigger=False  # TODO Update when TP/SL was triggered
+        )
 
         print(f'Model_{row["user"]}_{row["id"]} Entry Price: {row["entry_price"]} Close Price: {close_price}')    
         print(f'Model_{row["user"]}_{row["id"]} Profit: {profit_abs}$ ({round(profit_rel, 5)})%')

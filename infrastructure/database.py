@@ -532,3 +532,20 @@ class Database:
         self.execute_write_query(query, (trade_id, user, bot_id, timestamp, symbol, side, entry_price, close_price, money, profit_abs, profit_rel, trading_fee, tp_trigger, sl_trigger))
         self.commit()
         
+    def get_trades(self, user: int, bot_id: int, n: int, columns: list[str] = ['"timestamp"', 'side', 'entry_price', 'close_price', 'profit_rel', 'tp_trigger', 'sl_trigger']) -> list:
+        """
+        Retrieves the last 'n' trades made by a specific bot for a specific user from the 'trades' table in the PostgreSQL database.
+
+        Parameters:
+        - user (int): The unique identifier of the user who initiated the trades.
+        - bot_id (int): The unique identifier of the bot that made the trades.
+        - n (int): The number of trades to retrieve.
+        - columns (list[str], optional): A list of column names to retrieve from the 'trades' table. Defaults to ['"timestamp"', 'side', 'entry_price', 'close_price', 'profit_rel', 'tp_trigger', 'sl_trigger'].
+
+        Returns:
+        - list: A list containing the details of the retrieved trades. Each element in the list is a tuple representing a row in the 'trades' table.
+        """
+        query: str = f'SELECT {",".join(columns)} FROM trades WHERE "user"={user} AND "bot_id"={bot_id} ORDER BY "timestamp" DESC LIMIT({n})'
+        data = self.execute_read_query(query)
+        return data
+        

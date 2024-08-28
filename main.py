@@ -8,7 +8,8 @@ This file is the main entry point for the ML Trader application. It performs the
 5. Creates a table to store the latest prices for each tradeable symbol.
 6. Starts a separate thread to fetch and process data from the ByBit API.
 7. Creates a user table in the database.
-8. Starts the web application using Flask.
+8. Starts a separate thread to create predictions for all running models.
+9. Starts the web application using Flask.
 """
 import os
 import sys

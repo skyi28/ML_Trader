@@ -55,6 +55,7 @@ def start_stop_bot(user: int, bot_id: int, action: str) -> dict:
         value=eval(action),
         where_condition=f'WHERE "user"={user} AND "id"={bot_id}'
     )
+    # TODO Check if bot has an open position, if yes close it
     return jsonify(success=True)
 @login_required
 @endpoint.route('/train/<int:bot_id>', methods=['GET', 'POST'])

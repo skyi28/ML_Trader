@@ -192,12 +192,28 @@ class ExecuteModels:
         Returns:
         - None
         """
+        # TODO Implement Kelly criterion
+        invested_fraction = 1
+        
+        money: float = row['money']
+        
         if closing_position == 'long':
-            profit_abs: float = close_price - row['entry_price'] # TODO Calculate absolute profit which includes trading fees
-            profit_rel: float = float(profit_abs / row['entry_price']) - self.TRADING_FEE 
+            trade_diff: float = close_price - row['entry_price']
+            profit_rel: float = float(trade_diff / row['entry_price']) - self.TRADING_FEE 
+            profit_abs: float = money * profit_rel * invested_fraction
         elif closing_position == 'short':
-            profit_abs: float = row['entry_price'] - close_price # TODO Calculate absolute profit which includes trading fees
-            profit_rel: float = float(profit_abs / row['entry_price']) - self.TRADING_FEE
+            trade_diff: float = row['entry_price'] - close_price
+            profit_rel: float = float(trade_diff / row['entry_price']) - self.TRADING_FEE
+            profit_abs: float = money * profit_rel * invested_fraction
+            
+        money: float = money * (1 + profit_rel)
+        
+        self.db.update_table(
+            table_name='bots',
+            column='money',
+            value=money,
+            where_condition=f'WHERE "user"={row["user"]} AND "id"={row["id"]}'
+            )
             
         self.db.insert_trade(
             user=row['user'],
@@ -207,7 +223,7 @@ class ExecuteModels:
             side=closing_position,
             entry_price=row['entry_price'],
             close_price=close_price,
-            money=100, # TODO Update money
+            money=money,
             profit_abs=profit_abs,
             profit_rel=profit_rel,
             trading_fee=self.TRADING_FEE,
@@ -216,7 +232,7 @@ class ExecuteModels:
         )
 
         print(f'Model_{row["user"]}_{row["id"]} Entry Price: {row["entry_price"]} Close Price: {close_price}')    
-        print(f'Model_{row["user"]}_{row["id"]} Profit: {profit_abs}$ ({round(profit_rel, 5)})%')
+        print(f'Model_{row["user"]}_{row["id"]} Profit: {trade_diff}$ ({round(profit_rel, 5)})%')
 
             
             # TODO Save trade in database

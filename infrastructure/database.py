@@ -500,7 +500,7 @@ class Database:
         The DataFrame has the following columns: 'user', 'id', 'model_type', 'symbol',
         'technical_indicators', 'position', 'entry_price', 'prediction'.
         """
-        query: str = 'SELECT "user", "id", model_type, symbol, technical_indicators, position, entry_price, prediction FROM bots WHERE running=True'
+        query: str = 'SELECT "user", "id", model_type, symbol, technical_indicators, position, entry_price, prediction, money FROM bots WHERE running=True'
         data = self.execute_read_query(query, return_type='pd.DataFrame')
         return data
     

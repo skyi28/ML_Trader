@@ -175,6 +175,8 @@ def bot(bot_id: int) -> render_template:
     This function is decorated with @login_required, which ensures that only authenticated users can access this route.
     The bot's details are retrieved from the database using the provided bot_id and then rendered in the 'bot.html' template.
     """
+    # TODO Make sure that the requested bot belongs to the current user
+    
     bot = postgres_db.get_bot_by_id(bot_id)
     trades = postgres_db.get_trades(current_user.get_id(), bot_id, 50)
     return render_template('bot.html', user=current_user, bot=bot, trades=trades)

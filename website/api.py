@@ -3,6 +3,8 @@ from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
 import json
+import datetime
+import numpy as np
 import pandas as pd
 
 from website.user import User
@@ -33,8 +35,13 @@ def chart_data() -> dict:
     # TODO Error handling
     symbol: str = request.args.get('symbol')
     entries: int = int(request.args.get('entries'))
-     
-    query_result: list = postgres_db.execute_read_query(f"SELECT timestamp,close FROM {symbol.lower()} ORDER BY timestamp DESC LIMIT {entries}")
+    # TODO Rewrite entries to be timeframes instead and change the SQL query to something like SELECT price WHERE timestamp >= TO_DATE(...)
+    # Check if that makes sense due to the loss of trades which are shown then...
+    
+    return_trades: bool = eval(request.args.get('return_trades'))
+    
+    # TODO Check if this query can be optimized by deleting the ORDER BY statement and then reversing the list
+    query_result: list = postgres_db.execute_read_query(f"SELECT timestamp, close FROM {symbol.lower()} ORDER BY timestamp DESC LIMIT {entries}")
     dates = [data[0].strftime('%d.%m.%Y %H:%M:%S') for data in query_result]
     dates.reverse()
     price_data = [data[1] for data in query_result]
@@ -44,6 +51,35 @@ def chart_data() -> dict:
         'dates': dates,
         'price_data': price_data,
     }
+    
+    if return_trades:
+        user: int = int(request.args.get('user'))
+        bot_id: int = int(request.args.get('bot_id'))
+        min_date: datetime.datetime = dates[0]
+        
+        trades: pd.DataFrame = postgres_db.get_trades_for_plotting(user, bot_id, min_date) 
+        prices: pd.DataFrame = pd.DataFrame()
+        prices['timestamp'] = pd.to_datetime(dates)
+        
+        short_trades_indexes = []
+        long_trades_indexes = []
+
+        for _, trade in trades.iterrows():
+            trade_time = trade['timestamp']
+            price_time_diff = np.abs(prices['timestamp'] - trade_time)
+            closest_price_index = price_time_diff.idxmin()
+
+            if trade['side'] == 'short':
+                short_trades_indexes.append(closest_price_index)
+            elif trade['side'] == 'long':
+                long_trades_indexes.append(closest_price_index)
+                
+        additional_trade_info: dict = {
+            'short_trades_indexes': short_trades_indexes,
+            'long_trades_indexes':long_trades_indexes
+        }
+        
+        result.update(additional_trade_info)
     
     return json.dumps(result)
     

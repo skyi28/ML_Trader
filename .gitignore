@@ -6,5 +6,6 @@ models/saved_models/
 website/__pycache__/
 xgboost_example.ipynb
 xgboost_test.ipynb
+chart_test.ipynb
 
 .VSCodeCounter/

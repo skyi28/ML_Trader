@@ -149,12 +149,13 @@ class Database:
             self.logger.error(f'execute_write_query: Error executing the query: {str(e)}')
             self.logger.error(f'execute_write_query: Query: {query}')
             
-    def execute_read_query(self, query: str, first_only: bool = False, return_column_names: bool = False, return_type: str = 'list') -> list | tuple | pd.DataFrame | None:
+    def execute_read_query(self, query: str, params: tuple = (), first_only: bool = False, return_column_names: bool = False, return_type: str = 'list') -> list | tuple | pd.DataFrame | None:
         """
         Executes a read query on the PostgreSQL database and returns the result based on the specified parameters.
 
         Parameters:
         - query (str): The SQL query to be executed.
+        - params (tuples): The parameters which can be passed to the query. Works only when the return type is 'list'.
         - first_only (bool, optional): If True, only the first row of the result is returned. Defaults to False.
         - return_column_names (bool, optional): If True, the column names of the result are returned along with the data. Defaults to False.
         - return_type (str, optional): The type of the result. Can be either 'list' or 'pd.DataFrame'. Defaults to 'list'.
@@ -168,7 +169,7 @@ class Database:
         
         if return_type == 'list':
             try:
-                self.cursor.execute(query)
+                self.cursor.execute(query, params)
                 if first_only:
                     result = self.cursor.fetchone()
                     self.logger.debug('execute_read_query: Returns a single item!')
@@ -188,7 +189,7 @@ class Database:
                 self.logger.error(f'execute_read_query: Error executing query: {query} \n{str(e)}')
         elif return_type == 'pd.DataFrame':
             try:
-                result = pd.read_sql_query(query, self.engine)
+                result = pd.read_sql_query(query, self.engine, params=params)
                 self.logger.debug('execute_read_query: Returns a DataFrame!')
                 return result
             except Exception as e:
@@ -532,7 +533,7 @@ class Database:
         self.execute_write_query(query, (trade_id, user, bot_id, timestamp, symbol, side, entry_price, close_price, money, profit_abs, profit_rel, trading_fee, tp_trigger, sl_trigger))
         self.commit()
         
-    def get_trades(self, user: int, bot_id: int, n: int, columns: list[str] = ['"timestamp"', 'side', 'entry_price', 'close_price', 'profit_rel', 'tp_trigger', 'sl_trigger']) -> list:
+    def get_trades(self, user: int, bot_id: int, n: int, columns: list[str] = ['"timestamp"', 'side', 'entry_price', 'close_price', 'profit_rel', 'tp_trigger', 'sl_trigger'], return_type='list') -> list | pd.DataFrame:
         """
         Retrieves the last 'n' trades made by a specific bot for a specific user from the 'trades' table in the PostgreSQL database.
 
@@ -546,6 +547,25 @@ class Database:
         - list: A list containing the details of the retrieved trades. Each element in the list is a tuple representing a row in the 'trades' table.
         """
         query: str = f'SELECT {",".join(columns)} FROM trades WHERE "user"={user} AND "bot_id"={bot_id} ORDER BY "timestamp" DESC LIMIT({n})'
-        data = self.execute_read_query(query)
+        data = self.execute_read_query(query, return_type=return_type)
         return data
+    
+    def get_trades_for_plotting(self, user: int, bot_id: int, min_date: datetime.datetime, columns: list[str] = ['"timestamp"', 'side', 'entry_price', 'close_price', 'profit_rel', 'tp_trigger', 'sl_trigger'], return_type: str = 'pd.DataFrame') -> list | pd.DataFrame:
+        """
+        Retrieves trades made by a specific bot for a specific user from the 'trades' table in the PostgreSQL database,
+        filtered by a minimum date. The retrieved data is returned as a list or a pandas DataFrame.
+
+        Parameters:
+        - user (int): The unique identifier of the user who initiated the trades.
+        - bot_id (int): The unique identifier of the bot that made the trades.
+        - min_date (datetime.datetime): The minimum date for filtering the trades.
+        - columns (list[str], optional): A list of column names to retrieve from the 'trades' table. Defaults to ['"timestamp"', 'side', 'entry_price', 'close_price', 'profit_rel', 'tp_trigger', 'sl_trigger'].
+
+        Returns:
+        - list | pd.DataFrame: A list containing the details of the retrieved trades, or a pandas DataFrame if the 'return_type' parameter is set to 'pd.DataFrame'.
+        """
+        query: str = f'SELECT {",".join(columns)} FROM trades WHERE "user"={user} AND "bot_id"={bot_id} AND "timestamp" >= %s ORDER BY "timestamp" DESC'
+        data: list = self.execute_read_query(query, (min_date,), return_type=return_type)
+        return data
+
         

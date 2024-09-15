@@ -9,6 +9,7 @@
     <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="{{ url_for('static', filename='js/bot.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chart.js') }}"></script>
 </head>
 <body>
     <header>
@@ -27,7 +28,9 @@
         <div class="container">
             <div class="graph-section">
                 <h2>Price Development</h2>
-                <canvas id="priceGraph"></canvas>
+                <div class="line-graph-container">
+                    <canvas id="lineGraph"></canvas>
+                </div>
             </div>
             <div class="buttons-section">
                 <button id="startStopBot" onclick="toggleBot()">Start Bot</button>
@@ -163,6 +166,7 @@
             </div>
             <div class="trades-section">
                 <h2>Last Trades</h2>
+                <!-- TODO Create a histogram of the trade returns -->
                 <table>
                     <thead>
                         <tr>
@@ -200,88 +204,92 @@
     <script>
         var user = '{{ user.get_id() }}';
         var bot_id = '{{ bot[0] }}';
+        var symbol = '{{ bot[5] }}'
         window.onload = function() {
             checkTrainingStatus(user, bot_id);
             checkLastTrained(user, bot_id);
             checkBotRunning(user, bot_id);
         }
 
-        const ctx = document.getElementById('priceGraph').getContext('2d');
-        const data = [32000, 34000, 36000, 38000, 37000, 39000, 40000];
-        const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
-        const longPositions = [1, 4];
-        const shortPositions = [2, 5];
-        const positionInfo = new Array(data.length).fill('');
-        longPositions.forEach(index => positionInfo[index] = 'Long Position');
-        shortPositions.forEach(index => positionInfo[index] = 'Short Position');
+        const ctx = document.getElementById('lineGraph').getContext('2d');
+        // TODO Change this so the symobl is not hardcoded
+        var lineGraph = fetch_chart_data(symbol, 100, 'True', user, bot_id, ctx);
 
-        const priceGraph = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'BTC Price',
-                    data: data,
-                    borderColor: '#4BC0C0',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    fill: true,
-                    pointRadius: data.map((_, index) => {
-                        if (longPositions.includes(index) || shortPositions.includes(index)) {
-                            return 5;
-                        }
-                        return 0;
-                    }),
-                    pointBackgroundColor: data.map((_, index) => {
-                        if (longPositions.includes(index)) {
-                            return '#00FF00';
-                        } else if (shortPositions.includes(index)) {
-                            return '#FF0000';
-                        }
-                        return 'transparent';
-                    }),
-                    pointStyle: 'circle',
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    x: {
-                        display: true,
-                        title: {
-                            display: true,
-                            text: 'Month',
-                            color: 'white'
-                        },
-                        ticks: {
-                            color: 'white'
-                        }
-                    },
-                    y: {
-                        display: true,
-                        title: {
-                            display: true,
-                            text: 'Price in USD',
-                            color: 'white'
-                        },
-                        ticks: {
-                            color: 'white'
-                        }
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const label = context.dataset.label || '';
-                                const value = context.raw;
-                                const position = positionInfo[context.dataIndex];
-                                return `${label}: $${value} (${position})`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
+        // const data = [32000, 34000, 36000, 38000, 37000, 39000, 40000];
+        // const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
+        // const longPositions = [1, 4];
+        // const shortPositions = [2, 5];
+        // const positionInfo = new Array(data.length).fill('');
+        // longPositions.forEach(index => positionInfo[index] = 'Long Position');
+        // shortPositions.forEach(index => positionInfo[index] = 'Short Position');
+
+        // const priceGraph = new Chart(ctx, {
+        //     type: 'line',
+        //     data: {
+        //         labels: labels,
+        //         datasets: [{
+        //             label: 'BTC Price',
+        //             data: data,
+        //             borderColor: '#4BC0C0',
+        //             backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        //             fill: true,
+        //             pointRadius: data.map((_, index) => {
+        //                 if (longPositions.includes(index) || shortPositions.includes(index)) {
+        //                     return 5;
+        //                 }
+        //                 return 0;
+        //             }),
+        //             pointBackgroundColor: data.map((_, index) => {
+        //                 if (longPositions.includes(index)) {
+        //                     return '#00FF00';
+        //                 } else if (shortPositions.includes(index)) {
+        //                     return '#FF0000';
+        //                 }
+        //                 return 'transparent';
+        //             }),
+        //             pointStyle: 'circle',
+        //         }]
+        //     },
+        //     options: {
+        //         responsive: true,
+        //         scales: {
+        //             x: {
+        //                 display: true,
+        //                 title: {
+        //                     display: true,
+        //                     text: 'Month',
+        //                     color: 'white'
+        //                 },
+        //                 ticks: {
+        //                     color: 'white'
+        //                 }
+        //             },
+        //             y: {
+        //                 display: true,
+        //                 title: {
+        //                     display: true,
+        //                     text: 'Price in USD',
+        //                     color: 'white'
+        //                 },
+        //                 ticks: {
+        //                     color: 'white'
+        //                 }
+        //             }
+        //         },
+        //         plugins: {
+        //             tooltip: {
+        //                 callbacks: {
+        //                     label: function(context) {
+        //                         const label = context.dataset.label || '';
+        //                         const value = context.raw;
+        //                         const position = positionInfo[context.dataIndex];
+        //                         return `${label}: $${value} (${position})`;
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // });
 
         function checkBotRunning(user, bot_id){
             const button = document.getElementById('startStopBot');

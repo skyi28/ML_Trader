@@ -151,6 +151,8 @@ class ExecuteModels:
                     value=close_price,
                     where_condition=f'WHERE "user"={row["user"]} AND "id"={row["id"]}'
                 )
+                # TODO Idea is to prevent the bot from opening and directly closing a position -> Check if that works
+                return
 
 
         # Short position
@@ -177,6 +179,8 @@ class ExecuteModels:
                     value=close_price,
                     where_condition=f'WHERE "user"={row["user"]} AND "id"={row["id"]}'
                 )
+                # TODO Idea is to prevent the bot from opening and directly closing a position -> Check if that works
+                return
 
                 
     def log_trade(self, row: pd.Series, close_price: float, closing_position: str) -> None:

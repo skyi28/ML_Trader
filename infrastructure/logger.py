@@ -30,7 +30,7 @@ def create_logger(log_file: str, log_dir: str = 'logs') -> logging.Logger:
     Returns:
     - logging.Logger: The configured logger instance.
     """
-    logger = logging.getLogger(__name__)
+    logger = logging.getLogger(log_file)
     if config.logging.log_level == 'DEBUG':
         level = logging.DEBUG
     elif config.logging.log_level == 'INFO':

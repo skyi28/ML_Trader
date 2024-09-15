@@ -24,6 +24,7 @@ sys.path.append(path_to_config)
 
 import threading
 import subprocess
+import time
 
 from config.config import load_config
 from infrastructure.database import Database
@@ -44,6 +45,9 @@ start_postgres_command: str = f'.{os.sep}pg_ctl.exe start -D "A:{os.sep}PostgreS
 logger.info(f'Starting postgres...')
 result = subprocess.run(['powershell', '-Command',f'{change_dir_command}; {start_postgres_command}'])
 logger.info(f'Output: {result.stdout} \nError: {result.stderr}')
+
+# Wait until postgres is running
+# time.sleep(10)
 
 logger.info('Establishing connection to database')
 db = Database()

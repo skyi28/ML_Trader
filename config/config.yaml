@@ -2,7 +2,7 @@
 # Use <<project_root> as placeholder for the project root directory
 
 logging:
-  log_level: DEBUG
+  log_level: INFO
   log_folder: <<project_root>>/logs/
 
 postgres:
@@ -16,7 +16,7 @@ postgres:
 webserver:
   host: 127.0.0.1
   port: 5000
-  debug_mode: True
+  debug_mode: False
 
 tradeable_symbols: ["BTCUSD","ETHUSD"]
 trading_fees: 0.00 # No calculation can be performed here | #TODO Lookup trading fees on Bybit

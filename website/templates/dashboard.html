@@ -76,13 +76,13 @@
     <script>
         var shown_datapoints = document.getElementById('timeframe_select').value;
         const ctx = document.getElementById('lineGraph').getContext('2d');
-        var lineGraph = fetch_chart_data('{{ symbol }}', shown_datapoints, ctx);
+        var lineGraph = fetch_chart_data('{{ symbol }}', shown_datapoints, 'False', '-1', '-1', ctx);
 
         function handleCryptoChange(){
             var shown_datapoints = document.getElementById('timeframe_select').value;
             var symbol = document.getElementById('crypto_select').value;
             lineGraph.destroy();
-            lineGraph = fetch_chart_data(symbol, shown_datapoints, ctx);
+            lineGraph = fetch_chart_data(symbol, shown_datapoints, 'False', '-1', '-1', ctx);
         }
 
         function reset_zoom() {

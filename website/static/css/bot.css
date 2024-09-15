@@ -128,8 +128,27 @@ header {
 }
 
 .graph-section {
-    height: 60%; /* Adjust height as needed */
-    width: 100%; /* Full width */
+    flex: 1; /* This ensures the graph section takes the remaining available space */
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+    position: relative;
+    overflow: hidden; /* Prevents content from overflowing */
+}
+
+.line-graph-container {
+    flex: 1; /* Ensures the graph container fills the available space */
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    justify-content: center; /* Center the graph vertically */
+    align-items: center; /* Center the graph horizontally */
+    min-height: 300px; /* Minimum height for the graph container */
+    width: 100%; /* Full width of the container */
+}
+
+#lineGraph {
+    width: 100% !important; /* Full width of its container */
+    height: 100% !important; /* Full height of its container */
+    min-height: 300px; /* Ensure a minimum height for the graph */
 }
 
 .trades-section {

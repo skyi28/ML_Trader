@@ -94,3 +94,65 @@ function getErrorMetrics(user, bot_id) {
         $('#recall').text(`Recall: ${recall}`);
     });
 }
+
+function checkBotRunning(user, bot_id){
+    const button = document.getElementById('startStopBot');
+    var bot_running;
+    const url = '/api/bot_is_running/' + user + '/' + bot_id;
+    $.ajax({
+        url: url,
+        type: 'GET',
+        data: {
+            user: user,
+            bot_id: bot_id
+        },
+        success: function(response) {
+            response = $.parseJSON(response);
+            bot_running = response['running'];
+
+            if (bot_running === 'True') {
+                button.textContent = 'Stop Bot';
+                button.style.backgroundColor = '#DC3545';
+            } else {
+                button.textContent = 'Start Bot';
+                button.style.backgroundColor = '#4BC0C0';
+            }
+            console.error('THIS IS THE END');
+        },
+        error: function(xhr, status, error) {
+            console.error('Error checking if bot is running:', error);
+        }
+    })
+}
+
+function toggleBot(user, bot_id) {
+    const button = document.getElementById('startStopBot');
+
+    if (button.textContent === 'Start Bot') {
+        button.textContent = 'Stop Bot';
+        button.style.backgroundColor = '#DC3545';
+        var action = 'True';
+    } else {
+        button.textContent = 'Start Bot';
+        button.style.backgroundColor = '#4BC0C0';
+        var action = 'False';
+    }
+
+    const url = '/start_stop_bot/' + user + '/' + bot_id + '/' + action;
+    $.ajax({
+        url: url,
+        type: 'GET',
+        data: {
+            user: user,
+            bot_id: bot_id,
+            action: action
+        },
+        success: function(response) {
+
+        },
+        error: function(xhr, status, error) {
+            console.error('Error starting / stopping bot:', error);
+            console.error(url);
+        }
+    })
+}

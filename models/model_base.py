@@ -71,6 +71,8 @@ class ModelBase():
         query: str = f'SELECT * FROM bots WHERE "user"={user} AND id={model_id}'
         model_data = self.db.execute_read_query(query, return_type='pd.DataFrame')
         technical_indicators = model_data['technical_indicators'].iloc[0].split(',')
+        technical_indicators = [f'"{technical_indicator}"' for technical_indicator in technical_indicators]
+        
         return technical_indicators
 
     def get_symbol_from_database(self, user: int, model_id: int) -> str:

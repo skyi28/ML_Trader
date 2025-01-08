@@ -120,7 +120,7 @@ class ExecuteModels:
 
             symbol: str = row["symbol"]
             # TODO Take into account bid and ask price
-            close_price: float = self.db.execute_read_query(f"SELECT last_price FROM prices WHERE symbol='{symbol}' ORDER BY timestamp DESC LIMIT 1", return_type="pd.DataFrame")['last_price'].iloc[0]
+            close_price: float = float(self.db.execute_read_query(f"SELECT last_price FROM prices WHERE symbol='{symbol}' ORDER BY timestamp DESC LIMIT 1", return_type="pd.DataFrame")['last_price'].iloc[0])
             # Update entry price
             self.db.update_table(
                 table_name='bots',
@@ -141,7 +141,7 @@ class ExecuteModels:
                 )
                 symbol: str = row["symbol"]
                 # TODO Take into account bid and ask price
-                close_price: float = self.db.execute_read_query(f"SELECT last_price FROM prices WHERE symbol='{symbol}' ORDER BY timestamp DESC LIMIT 1", return_type="pd.DataFrame")['last_price'].iloc[0]
+                close_price: float = float(self.db.execute_read_query(f"SELECT last_price FROM prices WHERE symbol='{symbol}' ORDER BY timestamp DESC LIMIT 1", return_type="pd.DataFrame")['last_price'].iloc[0])
                 self.log_trade(row, close_price, 'long')
                 print(f'Model_{row["user"]}_{row["id"]} closed long position for {row["symbol"]}')
                 # Update entry price
@@ -168,7 +168,7 @@ class ExecuteModels:
 
                 symbol: str = row["symbol"]
                 # TODO Take into account bid and ask price
-                close_price: float = self.db.execute_read_query(f"SELECT last_price FROM prices WHERE symbol='{symbol}' ORDER BY timestamp DESC LIMIT 1", return_type="pd.DataFrame")['last_price'].iloc[0]
+                close_price: float = float(self.db.execute_read_query(f"SELECT last_price FROM prices WHERE symbol='{symbol}' ORDER BY timestamp DESC LIMIT 1", return_type="pd.DataFrame")['last_price'].iloc[0])
                 self.log_trade(row, close_price, 'short')
                 print(f'Model_{row["user"]}_{row["id"]} closed short position for {row["symbol"]}')
 
@@ -239,7 +239,6 @@ class ExecuteModels:
         print(f'Model_{row["user"]}_{row["id"]} Profit: {trade_diff}$ ({round(profit_rel, 5)})%')
 
             
-            # TODO Save trade in database
             # TODO Update money
             # TODO Include trading fees
             # TODO Include Kelly criterion

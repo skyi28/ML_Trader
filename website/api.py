@@ -57,26 +57,35 @@ def chart_data() -> dict:
         bot_id: int = int(request.args.get('bot_id'))
         min_date: datetime.datetime = dates[0]
         
-        trades: pd.DataFrame = postgres_db.get_trades_for_plotting(user, bot_id, min_date) 
+        trades: pd.DataFrame = postgres_db.get_trades_for_plotting(user, bot_id, min_date)
         prices: pd.DataFrame = pd.DataFrame()
         prices['timestamp'] = pd.to_datetime(dates)
         
         short_trades_indexes = []
         long_trades_indexes = []
 
+        short_trade_entry_prices = []
+        long_trade_entry_prices = []
+
         for _, trade in trades.iterrows():
             trade_time = trade['timestamp']
-            price_time_diff = np.abs(prices['timestamp'] - trade_time)
+            trade_time: str = datetime.datetime.strftime(trade_time, '%Y-%d-%m %H:%M:%S') 
+            trade_time = pd.to_datetime(trade_time)
+            price_time_diff = (prices['timestamp'] - trade_time).abs()
             closest_price_index = price_time_diff.idxmin()
 
             if trade['side'] == 'short':
                 short_trades_indexes.append(closest_price_index)
+                short_trade_entry_prices.append(trade['entry_price'])
             elif trade['side'] == 'long':
                 long_trades_indexes.append(closest_price_index)
+                long_trade_entry_prices.append(trade['entry_price'])
                 
         additional_trade_info: dict = {
             'short_trades_indexes': short_trades_indexes,
-            'long_trades_indexes':long_trades_indexes
+            'long_trades_indexes': long_trades_indexes,
+            'short_trade_entry_prices': short_trade_entry_prices,
+            'long_trade_entry_prices': long_trade_entry_prices
         }
         
         result.update(additional_trade_info)

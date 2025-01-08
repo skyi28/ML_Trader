@@ -212,7 +212,6 @@
         }
 
         const ctx = document.getElementById('lineGraph').getContext('2d');
-        // TODO Change this so the symobl is not hardcoded
         var lineGraph = fetch_chart_data(symbol, 100, 'True', user, bot_id, ctx);
 
         // const data = [32000, 34000, 36000, 38000, 37000, 39000, 40000];
@@ -313,7 +312,6 @@
                         button.textContent = 'Start Bot';
                         button.style.backgroundColor = '#4BC0C0';
                     }
-                    console.error('THIS IS THE END');
                 },
                 error: function(xhr, status, error) {
                     console.error('Error checking if bot is running:', error);

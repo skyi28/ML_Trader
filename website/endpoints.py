@@ -228,6 +228,9 @@ def bot_overview():
     """
     if request.method == 'GET':
         bots = postgres_db.get_all_bots_by_user(current_user.get_id())
+        if not bots:
+            bots: list[list[str]] = [['' for _ in range(8)]]
+            bots[0][3] = 'You have not created a bot yet.'
         return render_template('bot_overview.html', user=current_user, bots=bots)
 
 
@@ -399,6 +402,6 @@ def sign_up():
             db.session.commit()
             login_user(new_user, remember=True)
             flash('Account created!', category='success')
-            return redirect(url_for('endpoints.index'))
+            return redirect(url_for('endpoints.dashboard'))
 
     return render_template("sign_up.html", user=current_user)

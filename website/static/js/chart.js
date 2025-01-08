@@ -19,6 +19,8 @@ function fetch_chart_data(symbol, entries, return_trades, user, bot_id, ctx) {
                     response['symbol'], // Label 
                     response['short_trades_indexes'],
                     response['long_trades_indexes'],
+                    response['short_trade_entry_prices'],
+                    response['long_trade_entry_prices'],
                     'rgba(75, 192, 192, 1)', // Line color
                     'rgba(75, 192, 192, 0.2)', // Fill color
                     'Time', // X-axis title
@@ -45,11 +47,21 @@ function fetch_chart_data(symbol, entries, return_trades, user, bot_id, ctx) {
     })
 }
 
-function createLineGraphWithTrades(ctx, labels, data, label, shortPositions, longPositions, borderColor, backgroundColor, xAxisTitle, yAxisTitle) {
+function createLineGraphWithTrades(ctx, labels, data, label, shortPositions, longPositions, shortPrices, longPrices, borderColor, backgroundColor, xAxisTitle, yAxisTitle) {
     const positionInfo = new Array(data.length).fill('');
-    longPositions.forEach(index => positionInfo[index] = 'Long Position');
-    shortPositions.forEach(index => positionInfo[index] = 'Short Position');
-
+    const priceInfo = new Array(data.length).fill('');
+    
+    // Populate positionInfo and priceInfo arrays
+    longPositions.forEach((index, i) => {
+        positionInfo[index] = 'Long Position';
+        priceInfo[index] = longPrices[i]; // Match the price for the long position
+    });
+    
+    shortPositions.forEach((index, i) => {
+        positionInfo[index] = 'Short Position';
+        priceInfo[index] = shortPrices[i]; // Match the price for the short position
+    });
+    
     return new Chart(ctx, {
         type: 'line',
         data: {
@@ -108,7 +120,7 @@ function createLineGraphWithTrades(ctx, labels, data, label, shortPositions, lon
                     callbacks: {
                         label: function(context) {
                             const label = context.dataset.label || '';
-                            const value = context.raw;
+                            const value = priceInfo[context.dataIndex];
                             const position = positionInfo[context.dataIndex];
                             return `${label}: $${value} (${position})`;
                         }

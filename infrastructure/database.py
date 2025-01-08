@@ -564,7 +564,9 @@ class Database:
         Returns:
         - list | pd.DataFrame: A list containing the details of the retrieved trades, or a pandas DataFrame if the 'return_type' parameter is set to 'pd.DataFrame'.
         """
-        query: str = f'SELECT {",".join(columns)} FROM trades WHERE "user"={user} AND "bot_id"={bot_id} AND "timestamp" >= %s ORDER BY "timestamp" DESC'
+        min_date: datetime.datetime = datetime.datetime.strptime(min_date, '%d.%m.%Y %H:%M:%S')
+        min_date: str = datetime.datetime.strftime(min_date, '%Y-%m-%d %H:%M:%S')
+        query: str = f"""SELECT {",".join(columns)} FROM trades WHERE "user"={user} AND "bot_id"={bot_id} AND "timestamp" >= '{min_date}' ORDER BY "timestamp" DESC"""
         data: list = self.execute_read_query(query, (min_date,), return_type=return_type)
         return data
 

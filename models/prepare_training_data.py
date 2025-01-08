@@ -54,6 +54,9 @@ class PrepareTrainingData:
             feature_columns.insert(0, 'open')
         if 'close' not in feature_columns:
             feature_columns.insert(1,'close')
+        for idx, feature in enumerate(feature_columns):
+            if feature.find(' ') != -1:
+                feature_columns[idx] = feature.replace(' ','_')
 
         # This assumes that the historic price data is inserted ascending by time
         query = f"SELECT {','.join(feature_columns)} FROM {symbol} ORDER BY timestamp DESC LIMIT(1)"
@@ -87,6 +90,9 @@ class PrepareTrainingData:
                 feature_columns.insert(0, 'open')
             if 'close' not in feature_columns:
                 feature_columns.insert(1,'close')
+            for idx, feature in enumerate(feature_columns):
+                if feature.find(' ') != -1:
+                    feature_columns[idx] = feature.replace(' ','_')
             query: str = f"SELECT {','.join(feature_columns)} FROM {symbol}"
             
         if min_date:

@@ -40,11 +40,26 @@ logger.info(f'Loading config.yaml from {path_to_config}{os.sep}config{os.sep}con
 config = load_config(f'{path_to_config}{os.sep}config{os.sep}config.yaml')
 
 # Execute cmd commands to start the database
-change_dir_command: str = f'cd {config.postgres.path_to_postgres}{os.sep}bin'
-start_postgres_command: str = f'.{os.sep}pg_ctl.exe start -D "A:{os.sep}PostgreSQL{os.sep}16{os.sep}data"' # Replace this with path_to_postgres
-logger.info(f'Starting postgres...')
-result = subprocess.run(['powershell', '-Command',f'{change_dir_command}; {start_postgres_command}'])
-logger.info(f'Output: {result.stdout} \nError: {result.stderr}')
+# change_dir_command: str = f'cd {config.postgres.path_to_postgres}{os.sep}bin'
+# start_postgres_command: str = f'.{os.sep}pg_ctl.exe start -D "A:{os.sep}PostgreSQL{os.sep}16{os.sep}data"' # Replace this with path_to_postgres
+# logger.info(f'Starting postgres...')
+# result = subprocess.run(['powershell', '-Command',f'{change_dir_command}; {start_postgres_command}'])
+# logger.info(f'Output: {result.stdout} \nError: {result.stderr}')
+
+# Linux
+def start_postgres():
+    try:
+        # Run the command to start PostgreSQL service
+        subprocess.run(['sudo', 'service', 'postgresql', 'start'], check=True)
+        print("PostgreSQL service started successfully.")
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to start PostgreSQL service: {e}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+# Call the function to start PostgreSQL
+start_postgres()
+
 
 # Wait until postgres is running
 # time.sleep(10)

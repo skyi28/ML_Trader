@@ -36,6 +36,63 @@
                 <button id="startStopBot" onclick="toggleBot()">Start Bot</button>
                 <button id="retrainModel"><a href="/train/{{ bot[0] }}">(Re)train Model</a></button>
             </div>
+            <div class="stop-loss-section">
+                <!-- Stop Loss Input -->
+                <label for="stopLossInput" style="color: #4BC0C0;">Stop Loss (%):</label>
+                <input 
+                    type="number" 
+                    id="stopLossInput" 
+                    placeholder="Enter percentage" 
+                    style="border: 1px solid #4BC0C0; color: #4BC0C0; background: transparent;" 
+                    oninput="
+                        var user_id = '{{user.get_id()}}';
+                        var bot_id = '{{bot[0]}}';
+                        var symbol = '{{bot[5]}}';
+                        updateStopLossPrice(user_id, bot_id, symbol, false);
+                    "
+                />
+                
+                <!-- Trailing Stop Loss Checkbox -->
+                <label for="trailingStopLoss" style="color: #4BC0C0; margin-left: 20px;">
+                    <input 
+                        type="checkbox" 
+                        id="trailingStopLoss" 
+                        style="accent-color: #4BC0C0;"
+                    />
+                    Trailing Stop Loss
+                    <!-- TODO Read from the database if trailing stop loss is/was activated and depending on the status set the checkbox. -->
+                    <!-- TODO Implement the checkbox functionality / update the database when checkbox is set. -->
+                </label>
+                
+                <!-- Stop Loss Price Display -->
+                <br>
+                <span id="stopLossPriceShort" style="color: #4BC0C0; margin-left: 10px;">Price short trades: --</span>
+                <br>
+                <span id="stopLossPriceLong" style="color: #4BC0C0; margin-left: 10px;">Price long trades: --</span>
+                
+            </div>
+            <div class="stop-loss-section">
+                <!-- Take Profit Input -->
+                <label for="takeProfitInput" style="color: #4BC0C0;">Take Profit (%):</label>
+                <input 
+                    type="number" 
+                    id="takeProfitInput" 
+                    placeholder="Enter percentage" 
+                    style="border: 1px solid #4BC0C0; color: #4BC0C0; background: transparent;" 
+                    oninput="
+                    var user_id = '{{user.get_id()}}';
+                    var bot_id = '{{bot[0]}}';
+                    var symbol = '{{bot[5]}}';
+                    updateStopLossPrice(user_id, bot_id, symbol, false);
+                "
+                />
+                
+                <!-- Take Profit Price Display -->
+                <br>
+                <span id="takeProfitPriceShort" style="color: #4BC0C0; margin-left: 10px;">Price short trades: --</span>
+                <br>
+                <span id="takeProfitPriceLong" style="color: #4BC0C0; margin-left: 10px;">Price long trades: --</span>
+            </div>
             <div class="bot-info-section">
                 <h2>Bot Information</h2>
                 <ul>
@@ -209,86 +266,12 @@
             checkTrainingStatus(user, bot_id);
             checkLastTrained(user, bot_id);
             checkBotRunning(user, bot_id);
+            updateStopLossPrice(user, bot_id, symbol, true);
+            updateTakeProfitPrice(user, bot_id, symbol, true);
         }
 
         const ctx = document.getElementById('lineGraph').getContext('2d');
         var lineGraph = fetch_chart_data(symbol, 100, 'True', user, bot_id, ctx);
-
-        // const data = [32000, 34000, 36000, 38000, 37000, 39000, 40000];
-        // const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
-        // const longPositions = [1, 4];
-        // const shortPositions = [2, 5];
-        // const positionInfo = new Array(data.length).fill('');
-        // longPositions.forEach(index => positionInfo[index] = 'Long Position');
-        // shortPositions.forEach(index => positionInfo[index] = 'Short Position');
-
-        // const priceGraph = new Chart(ctx, {
-        //     type: 'line',
-        //     data: {
-        //         labels: labels,
-        //         datasets: [{
-        //             label: 'BTC Price',
-        //             data: data,
-        //             borderColor: '#4BC0C0',
-        //             backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        //             fill: true,
-        //             pointRadius: data.map((_, index) => {
-        //                 if (longPositions.includes(index) || shortPositions.includes(index)) {
-        //                     return 5;
-        //                 }
-        //                 return 0;
-        //             }),
-        //             pointBackgroundColor: data.map((_, index) => {
-        //                 if (longPositions.includes(index)) {
-        //                     return '#00FF00';
-        //                 } else if (shortPositions.includes(index)) {
-        //                     return '#FF0000';
-        //                 }
-        //                 return 'transparent';
-        //             }),
-        //             pointStyle: 'circle',
-        //         }]
-        //     },
-        //     options: {
-        //         responsive: true,
-        //         scales: {
-        //             x: {
-        //                 display: true,
-        //                 title: {
-        //                     display: true,
-        //                     text: 'Month',
-        //                     color: 'white'
-        //                 },
-        //                 ticks: {
-        //                     color: 'white'
-        //                 }
-        //             },
-        //             y: {
-        //                 display: true,
-        //                 title: {
-        //                     display: true,
-        //                     text: 'Price in USD',
-        //                     color: 'white'
-        //                 },
-        //                 ticks: {
-        //                     color: 'white'
-        //                 }
-        //             }
-        //         },
-        //         plugins: {
-        //             tooltip: {
-        //                 callbacks: {
-        //                     label: function(context) {
-        //                         const label = context.dataset.label || '';
-        //                         const value = context.raw;
-        //                         const position = positionInfo[context.dataIndex];
-        //                         return `${label}: $${value} (${position})`;
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     }
-        // });
 
         function checkBotRunning(user, bot_id){
             const button = document.getElementById('startStopBot');

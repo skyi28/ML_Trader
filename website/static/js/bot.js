@@ -117,7 +117,6 @@ function checkBotRunning(user, bot_id){
                 button.textContent = 'Start Bot';
                 button.style.backgroundColor = '#4BC0C0';
             }
-            console.error('THIS IS THE END');
         },
         error: function(xhr, status, error) {
             console.error('Error checking if bot is running:', error);
@@ -152,6 +151,166 @@ function toggleBot(user, bot_id) {
         },
         error: function(xhr, status, error) {
             console.error('Error starting / stopping bot:', error);
+            console.error(url);
+        }
+    })
+}
+
+function updateStopLossPrice(user, bot_id, symbol, first) {
+    var stopLossInput; // = document.getElementById('stopLossInput').value;
+    var stopLossPriceElementShort = document.getElementById('stopLossPriceShort');
+    var stopLossPriceElementLong = document.getElementById('stopLossPriceLong');
+    var currentPrice;
+
+    const url = '/api/last_price';
+    $.ajax({
+        url: url,
+        type: 'GET',
+        data: {
+            symbol: symbol
+        },
+        success: function(response) {
+            response = $.parseJSON(response);
+            currentPrice = parseFloat(response['last_price']);
+            if(first){
+                $.ajax({
+                    url: '/get_stop_loss/' + user + '/' + bot_id,
+                    type: 'GET',
+                    data: {
+                        user: user,
+                        bot_id: bot_id
+                    },
+                    success: function(response) {
+                        response = $.parseJSON(response);
+                        document.getElementById('stopLossInput').value = parseFloat(response['stop_loss'] * 100);
+                        stopLossInput = document.getElementById('stopLossInput').value;
+                        const stopLossPercentage = parseFloat(stopLossInput);
+                        const stopLossPriceShort = currentPrice + (currentPrice * stopLossPercentage / 100);
+                        const stopLossPriceLong = currentPrice - (currentPrice * stopLossPercentage / 100);
+                        stopLossPriceElementShort.textContent = `Price short trades: ${stopLossPriceShort.toFixed(2)}`;
+                        stopLossPriceElementLong.textContent = `Price long trades: ${stopLossPriceLong.toFixed(2)}`;
+                        console.log('On load stop loss: ' + parseFloat(response['stop_loss'] * 100));
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error looking up stop loss value:', error);
+                    }
+                });
+                return;
+            }
+
+            stopLossInput = document.getElementById('stopLossInput').value;
+            if (stopLossInput) {
+                const stopLossPercentage = parseFloat(stopLossInput);
+                const stopLossPriceShort = currentPrice + (currentPrice * stopLossPercentage / 100);
+                const stopLossPriceLong = currentPrice - (currentPrice * stopLossPercentage / 100);
+                stopLossPriceElementShort.textContent = `Price short trades: ${stopLossPriceShort.toFixed(2)}`;
+                stopLossPriceElementLong.textContent = `Price long trades: ${stopLossPriceLong.toFixed(2)}`;
+
+                // Update the stop loss value within the database
+                const update_stop_loss_url = '/set_stop_loss/' + user + '/' + bot_id + '/' + stopLossPercentage / 100;
+                $.ajax({
+                    url: update_stop_loss_url,
+                    type: 'POST',
+                    data: {
+                        user: user,
+                        bot_id: bot_id,
+                        stop_loss: stopLossPercentage / 100
+                    },
+                    success: function(response) {
+                        console.log('Stop loss value updated successfully:', response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error updating stop loss value:', error);
+                        console.error(update_stop_loss_url);
+                    }
+                })
+            } else {
+                stopLossPriceElementShort.textContent = 'Price short trades: --';
+                stopLossPriceElementLong.textContent = 'Price long trades: --';
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error getting last price:', error);
+            console.error(url);
+        }
+    })
+}
+
+function updateTakeProfitPrice(user, bot_id, symbol, first) {
+    var takeProfitInput; // = document.getElementById('takeProfitInput').value;
+    var takeProfitPriceElementShort = document.getElementById('takeProfitPriceShort');
+    var takeProfitPriceElementLong = document.getElementById('takeProfitPriceLong');
+    var currentPrice;
+
+    const url = '/api/last_price';
+    $.ajax({
+        url: url,
+        type: 'GET',
+        data: {
+            symbol: symbol
+        },
+        success: function(response) {
+            response = $.parseJSON(response);
+            currentPrice = parseFloat(response['last_price']);
+            if(first){
+                $.ajax({
+                    url: '/get_take_profit/' + user + '/' + bot_id,
+                    type: 'GET',
+                    data: {
+                        user: user,
+                        bot_id: bot_id
+                    },
+                    success: function(response) {
+                        response = $.parseJSON(response);
+                        document.getElementById('takeProfitInput').value = parseFloat(response['take_profit'] * 100);
+                        takeProfitInput = document.getElementById('takeProfitInput').value;
+                        const takeProfitPercentage = parseFloat(takeProfitInput);
+                        const takeProfitPriceShort = currentPrice + (currentPrice * takeProfitPercentage / 100);
+                        const takeProfitPriceLong = currentPrice - (currentPrice * takeProfitPercentage / 100);
+                        takeProfitPriceElementShort.textContent = `Price short trades: ${takeProfitPriceShort.toFixed(2)}`;
+                        takeProfitPriceElementLong.textContent = `Price long trades: ${takeProfitPriceLong.toFixed(2)}`;
+                        console.log('On load stop loss: ' + parseFloat(response['take_profit'] * 100));
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error looking up stop loss value:', error);
+                    }
+                });
+                return;
+            }
+
+            takeProfitInput = document.getElementById('takeProfitInput').value;
+            if (takeProfitInput) {
+                const takeProfitPercentage = parseFloat(takeProfitInput);
+                const takeProfitPriceShort = currentPrice + (currentPrice * takeProfitPercentage / 100);
+                const takeProfitPriceLong = currentPrice - (currentPrice * takeProfitPercentage / 100);
+                takeProfitPriceElementShort.textContent = `Price short trades: ${takeProfitPriceShort.toFixed(2)}`;
+                takeProfitPriceElementLong.textContent = `Price long trades: ${takeProfitPriceLong.toFixed(2)}`;
+
+                // Update the stop loss value within the database
+                const update_take_profit_url = '/set_take_profit/' + user + '/' + bot_id + '/' + takeProfitPercentage / 100;
+                $.ajax({
+                    url: update_take_profit_url,
+                    type: 'POST',
+                    data: {
+                        user: user,
+                        bot_id: bot_id,
+                        take_profit: takeProfitPercentage / 100
+                    },
+                    success: function(response) {
+                        console.log('Stop loss value updated successfully:', response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error updating stop loss value:', error);
+                        console.error(update_take_profit_url);
+                    }
+                })
+            } else {
+                takeProfitPriceElementShort.textContent = 'Price short trades: --';
+                takeProfitPriceElementLong.textContent = 'Price long trades: --';
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error getting last price:', error);
             console.error(url);
         }
     })

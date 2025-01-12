@@ -160,20 +160,24 @@ class BybitData:
         - (pd.DataFrame): A pandas dataframe containing the historical data.
         """
         data = []
-        try:
-            if start and end:
-                next_end = start + datetime.timedelta(minutes=int(interval)*limit)
-                data.append(self.get_data_helper(start, next_end, symbol, interval, limit))
-            
-                while data[-1]["Timestamp"].iloc[-1] < end:
-                    next_start = data[-1]["Timestamp"].iloc[-1] + datetime.timedelta(minutes=int(interval))
-                    next_end = next_start + datetime.timedelta(minutes=int(interval)*limit)
-                    data.append(self.get_data_helper(symbol, next_start, next_end, symbol, interval, limit))
-            else:
-                data.append(self.get_data_helper(symbol=symbol, interval=interval, limit=limit))
-        except Exception as e:
-            self.logger.error(f"Error retrieving data for {symbol} from Bybit. \n{e}")
-            return None
+    # try:
+        if start and end:
+            next_end = start + datetime.timedelta(minutes=int(interval)*limit)
+            data.append(self.get_data_helper(start, next_end, symbol, interval, limit))
+        
+            while data[-1]["Timestamp"].iloc[-1] < end:
+                next_start = data[-1]["Timestamp"].iloc[-1] + datetime.timedelta(minutes=int(interval))
+                next_end = next_start + datetime.timedelta(minutes=int(interval)*limit)
+                data_to_add = self.get_data_helper(next_start, next_end, symbol, interval, limit)
+                if not data_to_add.empty:
+                    data.append(data_to_add)
+                else:
+                    break
+        else:
+            data.append(self.get_data_helper(symbol=symbol, interval=interval, limit=limit))
+    # except Exception as e:
+    #     self.logger.error(f"Error retrieving data for {symbol} from Bybit. \n{e}")
+    #     return None
             
         data = pd.concat(data, axis=0)
         data.reset_index(inplace=True, drop=True)

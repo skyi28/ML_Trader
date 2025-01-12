@@ -196,7 +196,7 @@ class Database:
                 self.logger.error(f'execute_read_query: Error reading the query: {query} \n{str(e)}')
         
         
-    def create_table(self, table_name: str, column_names_and_types: list[str], unique_constraints: list[str] = None, primary_keys: list[str] = None) -> bool:
+    def create_table(self, table_name: str, column_names_and_types: list[str], unique_constraints: list[str] = None, primary_keys: list[str] = None, create_index_column: str = None) -> bool:
         """
         Creates a new table in the PostgreSQL database with the specified column names and types.
 
@@ -232,6 +232,11 @@ class Database:
             query += ');'
             
             self.execute_write_query(query)
+
+            if create_index_column:
+                query = f'CREATE INDEX IF NOT EXISTS idx_{table_name}_{create_index_column} ON {table_name} ({create_index_column})'
+                self.execute_write_query(query)
+
             self.commit()
             return True
         except Exception as e:
@@ -370,6 +375,42 @@ class Database:
             self.logger.error(f'provide_unique_id: Error fetching the highest ID: {str(e)} Returning 0 as new id!')
             new_id = 0  # default value if an error occurs
         return new_id
+    
+    def determine_newest_data(self, symbol: str):
+        query: str = f"""SELECT "timestamp" FROM {symbol} ORDER BY "timestamp" DESC LIMIT(1)"""
+        try:
+            return self.execute_read_query(query, first_only=True)[0]
+        except Exception as e:
+            self.logger.error(f'determine_oldest_data: Error fetching the oldest data: {str(e)} Returning None as the oldest data!')
+            return None
+    
+    def determine_oldest_data(self, symbol: str):
+        query: str = f"""SELECT "timestamp" FROM {symbol} ORDER BY "timestamp" ASC LIMIT(1)"""
+        try:
+            return self.execute_read_query(query, first_only=True)[0]
+        except Exception as e:
+            self.logger.error(f'determine_oldest_data: Error fetching the oldest data: {str(e)} Returning None as the oldest data!')
+            return None
+    
+    def determine_gaps_within_historical_data(self, symbol: str):
+        query: str = 'SELECT timestamp FROM btcusd ORDER BY timestamp'
+        timestamps = self.execute_read_query(query)
+
+        # List to store the tuples of timestamps where the difference >= 2 minutes
+        large_diff_timestamps = []
+
+        # Loop through the timestamps to check the difference
+        for i in range(1, len(timestamps)):
+            last_timestamp = timestamps[i-1][0]
+            next_timestamp = timestamps[i][0]
+            
+            # Calculate the difference in minutes
+            diff = (next_timestamp - last_timestamp).total_seconds() / 60.0
+            
+            if diff >= 2:
+                large_diff_timestamps.append((last_timestamp, next_timestamp))
+        
+        return large_diff_timestamps
     
     def insert_new_bot(self, new_id: int, user: int, name:str, symbol: str, timeframe: int, model_type: str, technical_indicators: str, hyper_parameters: dict, money: float) -> None:
         """

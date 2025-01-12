@@ -24,7 +24,6 @@ sys.path.append(path_to_config)
 
 import threading
 import subprocess
-import time
 
 from config.config import load_config
 from infrastructure.database import Database
@@ -79,7 +78,7 @@ for symbol in config.tradeable_symbols:
             else:
                 column_names_and_types.append(f"{indicator} FLOAT")
     unique_constraints = ['"timestamp"']
-    db.create_table(symbol, column_names_and_types, unique_constraints)
+    db.create_table(symbol, column_names_and_types, unique_constraints, create_index_column='timestamp')
     
 # Create latest price tables
 for symbol in config.tradeable_symbols:
@@ -98,10 +97,10 @@ data_thread.start()
 db.create_table('"user"', ['id INT','email VARCHAR','password VARCHAR','first_name VARCHAR','last_name VARCHAR'], primary_keys=['id'])
 
 # Create bots table
-db.create_table('bots', ['id INT', '"user" INT', 'name VARCHAR', 'created TIMESTAMP', 'last_trained TIMESTAMP', 'symbol VARCHAR', 'timeframe INT', 'model_type VARCHAR', 'technical_indicators VARCHAR', 'hyper_parameters JSON', 'training BOOL', 'training_set_percentage FLOAT', 'training_error_metrics JSON', 'running BOOL', 'prediction FLOAT', 'position VARCHAR', 'entry_price FLOAT', 'money FLOAT'], primary_keys=['id'])
+db.create_table('bots', ['id INT', '"user" INT', 'name VARCHAR', 'created TIMESTAMP', 'last_trained TIMESTAMP', 'symbol VARCHAR', 'timeframe INT', 'model_type VARCHAR', 'technical_indicators VARCHAR', 'hyper_parameters JSON', 'training BOOL', 'training_set_percentage FLOAT', 'training_error_metrics JSON', 'running BOOL', 'prediction FLOAT', 'position VARCHAR', 'entry_price FLOAT', 'money FLOAT', 'stop_loss FLOAT', 'stop_loss_trailing BOOL', 'take_profit FLOAT'], primary_keys=['id'])
 
 # Create trades table
-db.create_table('trades', ['trade_id INT', '"user" INT', 'bot_id INT', '"timestamp" TIMESTAMP', 'symbol VARCHAR', 'side VARCHAR', 'entry_price FLOAT', 'close_price FLOAT', 'money FLOAT', 'profit_abs FLOAT', 'profit_rel FLOAT', 'trading_fee FLOAT', 'tp_trigger BOOL', 'sl_trigger BOOL'], primary_keys=['trade_id'])
+db.create_table('trades', ['trade_id INT', '"user" INT', 'bot_id INT', '"timestamp" TIMESTAMP', 'symbol VARCHAR', 'side VARCHAR', 'entry_price FLOAT', 'close_price FLOAT', 'money FLOAT', 'profit_abs FLOAT', 'profit_rel FLOAT', 'trading_fee FLOAT', 'tp_trigger BOOL', 'sl_trigger BOOL'], primary_keys=['trade_id'], create_index_column='timestamp')
 
 logger.info('Starting model prediction thread')
 db.execute_write_query("UPDATE bots SET position='neutral'")

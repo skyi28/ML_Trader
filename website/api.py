@@ -107,6 +107,7 @@ def get_last_price() -> dict:
     """
     symbol: str = request.args.get('symbol')
     query_result: pd.DataFrame = postgres_db.execute_read_query(f"SELECT * FROM prices WHERE symbol='{symbol}' ORDER BY timestamp DESC LIMIT 1", return_type="pd.DataFrame")
+    query_result = query_result.loc[0]
     return query_result.to_json()
 
 @login_required

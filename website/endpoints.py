@@ -9,6 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import json
 import threading
 import datetime
+import pandas as pd
 
 from website.user import User
 from website.app import db
@@ -156,6 +157,48 @@ def bot_train_execute(user: int, bot: list, start_time: datetime.datetime, end_t
         where_condition=f'WHERE "user"={user} AND "id"={bot[0]}'
     )
 
+@login_required
+@endpoint.route('/set_stop_loss/<int:user>/<int:bot_id>/<float:stop_loss>', methods=['POST'])
+def set_stop_loss(user: int, bot_id: int, stop_loss: float) -> None:
+    postgres_db.update_table('bots', 'stop_loss', stop_loss, f"""WHERE "user"={user} AND "id"={bot_id}""")
+    return {'success': True}
+
+@login_required
+@endpoint.route('/get_stop_loss/<int:user>/<int:bot_id>', methods=['GET'])
+def get_stop_loss(user: int, bot_id: int) -> None:
+    query = f"""SELECT stop_loss FROM bots WHERE "user"={user} AND "id"={bot_id}"""
+    query_response: pd.DataFrame = postgres_db.execute_read_query(query, return_type='pd.DataFrame')
+    stop_loss = query_response.loc[0];
+    return stop_loss.to_json()
+
+@login_required
+@endpoint.route('/set_stop_loss_trailing/<int:user>/<int:bot_id>/<string:trailing>', methods=['POST'])
+def set_stop_loss_trailing(user: int, bot_id: int, trailing: str) -> None:
+    trailing: bool = trailing.lower() == 'true'
+    postgres_db.update_table('bots', 'stop_loss_trailing', trailing, f"""WHERE "user"={user} AND "id"={bot_id}""")
+    return {'success': True}
+
+@login_required
+@endpoint.route('/get_trailing/<int:user>/<int:bot_id>', methods=['GET'])
+def get_stop_loss_trailing(user: int, bot_id: int) -> None:
+    query = f"""SELECT stop_loss_trailing FROM bots WHERE "user"={user} AND "id"={bot_id}"""
+    query_response: pd.DataFrame = postgres_db.execute_read_query(query, return_type='pd.DataFrame')
+    stop_loss_trailing = query_response.loc[0];
+    return stop_loss_trailing.to_json()
+
+@login_required
+@endpoint.route('/set_take_profit/<int:user>/<int:bot_id>/<float:take_profit>', methods=['POST'])
+def set_take_profit(user: int, bot_id: int, take_profit: float) -> None:
+    postgres_db.update_table('bots', 'take_profit', take_profit, f"""WHERE "user"={user} AND "id"={bot_id}""")
+    return {'success': True}
+
+@login_required
+@endpoint.route('/get_take_profit/<int:user>/<int:bot_id>', methods=['GET'])
+def get_take_profit(user: int, bot_id: int) -> None:
+    query = f"""SELECT take_profit FROM bots WHERE "user"={user} AND "id"={bot_id}"""
+    query_response: pd.DataFrame = postgres_db.execute_read_query(query, return_type='pd.DataFrame')
+    take_profit = query_response.loc[0];
+    return take_profit.to_json()
 
 @login_required
 @endpoint.route('/bot/<int:bot_id>')

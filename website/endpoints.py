@@ -159,13 +159,41 @@ def bot_train_execute(user: int, bot: list, start_time: datetime.datetime, end_t
 
 @login_required
 @endpoint.route('/set_stop_loss/<int:user>/<int:bot_id>/<float:stop_loss>', methods=['POST'])
-def set_stop_loss(user: int, bot_id: int, stop_loss: float) -> None:
+def set_stop_loss(user: int, bot_id: int, stop_loss: float) -> dict:
+    """
+    Updates the stop loss value for a specific bot in the database.
+
+    Parameters:
+    - user (int): The ID of the user who owns the bot.
+    - bot_id (int): The ID of the bot for which the stop loss value needs to be updated.
+    - stop_loss (float): The new stop loss value to be set for the bot.
+
+    Returns:
+    - dict: A dictionary containing a single key-value pair, where the key is 'success' and the value is True.
+
+    This function is decorated with @login_required, ensuring that only authenticated users can access this route.
+    The stop loss value is updated in the 'bots' table of the database using the provided user ID and bot ID.
+    """
     postgres_db.update_table('bots', 'stop_loss', stop_loss, f"""WHERE "user"={user} AND "id"={bot_id}""")
     return {'success': True}
 
 @login_required
 @endpoint.route('/get_stop_loss/<int:user>/<int:bot_id>', methods=['GET'])
-def get_stop_loss(user: int, bot_id: int) -> None:
+def get_stop_loss(user: int, bot_id: int) -> dict:
+    """
+    Retrieves the stop loss value for a specific bot from the database.
+
+    Parameters:
+    - user (int): The ID of the user who owns the bot.
+    - bot_id (int): The ID of the bot for which the stop loss value needs to be retrieved.
+
+    Returns:
+    - dict: The function returns the stop loss value as a JSON string.
+
+    This function is decorated with @login_required, ensuring that only authenticated users can access this route.
+    The stop loss value is retrieved from the 'bots' table of the database using the provided user ID and bot ID.
+    The retrieved stop loss value is then converted to a JSON string and returned.
+    """
     query = f"""SELECT stop_loss FROM bots WHERE "user"={user} AND "id"={bot_id}"""
     query_response: pd.DataFrame = postgres_db.execute_read_query(query, return_type='pd.DataFrame')
     stop_loss = query_response.loc[0];
@@ -173,14 +201,42 @@ def get_stop_loss(user: int, bot_id: int) -> None:
 
 @login_required
 @endpoint.route('/set_stop_loss_trailing/<int:user>/<int:bot_id>/<string:trailing>', methods=['POST'])
-def set_stop_loss_trailing(user: int, bot_id: int, trailing: str) -> None:
+def set_stop_loss_trailing(user: int, bot_id: int, trailing: str) -> dict:
+    """
+    Updates the stop loss trailing value for a specific bot in the database.
+
+    Parameters:
+    - user (int): The ID of the user who owns the bot.
+    - bot_id (int): The ID of the bot for which the stop loss trailing value needs to be updated.
+    - trailing (str): The new stop loss trailing value to be set for the bot. It should be either 'true' or 'false'.
+
+    Returns:
+    - dict: A dictionary containing a single key-value pair, where the key is 'success' and the value is True.
+
+    This function is decorated with @login_required, ensuring that only authenticated users can access this route.
+    The stop loss trailing value is updated in the 'bots' table of the database using the provided user ID and bot ID.
+    """
     trailing: bool = trailing.lower() == 'true'
     postgres_db.update_table('bots', 'stop_loss_trailing', trailing, f"""WHERE "user"={user} AND "id"={bot_id}""")
     return {'success': True}
 
 @login_required
 @endpoint.route('/get_trailing/<int:user>/<int:bot_id>', methods=['GET'])
-def get_stop_loss_trailing(user: int, bot_id: int) -> None:
+def get_stop_loss_trailing(user: int, bot_id: int) -> dict:
+    """
+    Retrieves the stop loss trailing value for a specific bot from the database.
+
+    Parameters:
+    - user (int): The ID of the user who owns the bot.
+    - bot_id (int): The ID of the bot for which the stop loss trailing value needs to be retrieved.
+
+    Returns:
+    - dict: The function returns the stop loss trailing value as a JSON string.
+
+    This function is decorated with @login_required, ensuring that only authenticated users can access this route.
+    The stop loss trailing value is retrieved from the 'bots' table of the database using the provided user ID and bot ID.
+    The retrieved stop loss trailing value is then converted to a JSON string and returned.
+    """
     query = f"""SELECT stop_loss_trailing FROM bots WHERE "user"={user} AND "id"={bot_id}"""
     query_response: pd.DataFrame = postgres_db.execute_read_query(query, return_type='pd.DataFrame')
     stop_loss_trailing = query_response.loc[0];
@@ -188,13 +244,43 @@ def get_stop_loss_trailing(user: int, bot_id: int) -> None:
 
 @login_required
 @endpoint.route('/set_take_profit/<int:user>/<int:bot_id>/<float:take_profit>', methods=['POST'])
-def set_take_profit(user: int, bot_id: int, take_profit: float) -> None:
+def set_take_profit(user: int, bot_id: int, take_profit: float) -> dict:
+    """
+    Updates the take profit value for a specific bot in the database.
+
+    Parameters:
+    - user (int): The ID of the user who owns the bot.
+    - bot_id (int): The ID of the bot to update.
+    - take_profit (float): The new take profit value to set for the bot.
+
+    Returns:
+    - dict: A dictionary containing a single key-value pair.
+        - 'success': A boolean value indicating whether the update was successful.
+
+    This function is decorated with `@login_required` to ensure that only authenticated users can access this route.
+    It updates the take profit value for the specified bot in the database using the provided user ID and bot ID.
+    """
     postgres_db.update_table('bots', 'take_profit', take_profit, f"""WHERE "user"={user} AND "id"={bot_id}""")
     return {'success': True}
 
 @login_required
 @endpoint.route('/get_take_profit/<int:user>/<int:bot_id>', methods=['GET'])
-def get_take_profit(user: int, bot_id: int) -> None:
+def get_take_profit(user: int, bot_id: int) -> dict:
+    """
+    Retrieves the take profit value for a specific bot from the database.
+
+    Parameters:
+    - user (int): The ID of the user who owns the bot. This parameter is expected to be an integer.
+    - bot_id (int): The unique identifier of the bot. This parameter is expected to be an integer.
+
+    Returns:
+    - dict: The function returns the take profit value as a JSON string.
+
+    Note:
+    - This function is decorated with `@login_required` to ensure that only authenticated users can access this route.
+    - The take profit value is retrieved from the database using the provided user ID and bot ID.
+    - The retrieved take profit value is then converted to a JSON string and returned.
+    """
     query = f"""SELECT take_profit FROM bots WHERE "user"={user} AND "id"={bot_id}"""
     query_response: pd.DataFrame = postgres_db.execute_read_query(query, return_type='pd.DataFrame')
     take_profit = query_response.loc[0];

@@ -156,6 +156,57 @@ function toggleBot(user, bot_id) {
     })
 }
 
+function initialilzeTrailingStopLoss(user, bot_id){
+    var trailingStopLossElement = document.getElementById('trailingStopLoss');
+
+    $.ajax({
+        url: '/get_trailing/' + user + '/' +bot_id,
+        type: 'GET',
+        data: {
+            user: user,
+            bot_id: bot_id
+        } ,
+        success: function(response) {
+            response = $.parseJSON(response);
+            if(response['stop_loss_trailing'] == true){
+                trailingStopLossElement.checked = true;
+            }else{
+                trailingStopLossElement.checked = false;
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error getting the status for the stop loss trailing checkbox: ', error);
+        }
+    });
+}
+
+function updateTrailingStopLoss(user, bot_id){
+    var trailingStopLossElement = document.getElementById('trailingStopLoss');
+
+    var changeTrailingStopLossTo;
+    if(trailingStopLossElement.checked){
+        changeTrailingStopLossTo = "true";
+    }else{
+        changeTrailingStopLossTo = "false";
+    }
+    
+    $.ajax({
+        url: '/set_stop_loss_trailing/' + user + '/' + bot_id + '/' + changeTrailingStopLossTo,
+        type: 'POST',
+        data: {
+            user: user,
+            bot_id: bot_id,
+            trailing: changeTrailingStopLossTo
+        } ,
+        success: function(response) {
+            console.log(response);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error setting the status for the stop loss trailing checkbox: ', error);
+        }
+    });
+}
+
 function updateStopLossPrice(user, bot_id, symbol, first) {
     var stopLossInput; // = document.getElementById('stopLossInput').value;
     var stopLossPriceElementShort = document.getElementById('stopLossPriceShort');
@@ -231,7 +282,6 @@ function updateStopLossPrice(user, bot_id, symbol, first) {
         },
         error: function(xhr, status, error) {
             console.error('Error getting last price:', error);
-            console.error(url);
         }
     })
 }

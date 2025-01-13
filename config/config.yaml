@@ -16,7 +16,7 @@ postgres:
 webserver:
   host: 127.0.0.1
   port: 5000
-  debug_mode: False # If debug mode is enabled the application is started twice so that trades are logged twice.
+  debug_mode: True # If debug mode is enabled the application is started twice so that trades are logged twice.
 
 tradeable_symbols: ["BTCUSD","ETHUSD"]
 trading_fees: 0.00 # No calculation can be performed here | #TODO Lookup trading fees on Bybit

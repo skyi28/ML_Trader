@@ -59,7 +59,7 @@ def chart_data() -> dict:
         
         trades: pd.DataFrame = postgres_db.get_trades_for_plotting(user, bot_id, min_date)
         prices: pd.DataFrame = pd.DataFrame()
-        prices['timestamp'] = pd.to_datetime(dates)
+        prices['timestamp'] = pd.to_datetime(dates, format='mixed')
         
         short_trades_indexes = []
         long_trades_indexes = []

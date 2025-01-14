@@ -91,6 +91,24 @@ def chart_data() -> dict:
         result.update(additional_trade_info)
     
     return json.dumps(result)
+
+@login_required
+@api.route('/api/get_money_development_data/<int:user>/<int:bot_id>', methods=['GET'])
+def get_money_development_data(user: int, bot_id: int) -> dict:
+    query: str = f'SELECT timestamp, money FROM trades WHERE "user"={user} AND bot_id={bot_id} ORDER BY timestamp DESC'
+    query_result: pd.DataFrame = postgres_db.execute_read_query(query)
+
+    dates = [data[0].strftime('%d.%m.%Y %H:%M:%S') for data in query_result]
+    dates.reverse()
+    money_data = [data[1] for data in query_result]
+    money_data.reverse()
+
+    result: dict = {
+        'dates': dates,
+        'money': money_data,
+    }
+
+    return json.dumps(result)
     
 @login_required
 @api.route('/api/last_price')
@@ -164,3 +182,87 @@ def bot_is_running(user: int, bot_id: int) -> str:
     query_result = postgres_db.execute_read_query(query, return_type='pd.DataFrame')
     result: dict = {'running': str(query_result['running'].iloc[0])}
     return json.dumps(result)
+
+@login_required
+@api.route('/api/data_for_trades_histogram/<int:user>/<int:bot_id>/<int:number_of_bins>')
+def get_data_for_trades_histogram(user: int, bot_id: int, number_of_bins: int) -> dict:
+    """
+    Retrieves all trades for a specific bot for a given user from a PostgreSQL database.
+
+    Parameters:
+    - user (int): The unique identifier of the user. This parameter is used to identify the user in the database.
+    - bot_id (int): The unique identifier of the bot. This parameter is used to identify the bot in the database.
+
+    Returns:
+    - dict: A JSON string representing all trades for the bot.
+    """
+    query: str = f'SELECT profit_rel FROM trades WHERE "user"={user} AND "bot_id"={bot_id}'
+    query_result: pd.DataFrame = postgres_db.execute_read_query(query, return_type='pd.DataFrame')
+    query_result['profit_rel'] = query_result['profit_rel'] * 100 # convert to percentage
+
+    min_return: float = float(query_result['profit_rel'].min())
+    max_return: float = float(query_result['profit_rel'].max())
+    bin_width: float = (max_return - min_return) / (number_of_bins - 1)
+
+    bins = []
+
+    # If negative values exist
+    if min_return < 0:
+        # Find the largest multiple of bin_width less than or equal to min_return
+        neg_start = -(-min_return // bin_width) * bin_width  # Equivalent to math.floor for negatives
+        bins.extend([neg_start + bin_width * i for i in range(int(abs(neg_start) // bin_width) + 1)])
+
+    # Add zero as a boundary if the range spans negative to positive
+    if min_return < 0 < max_return:
+        bins.append(0)
+
+    # If positive values exist
+    if max_return > 0:
+        pos_start = 0 if min_return < 0 else min_return  # Start from 0 if range includes negatives
+        bins.extend([pos_start + bin_width * i for i in range(1, int(max_return // bin_width) + 2)])
+
+    # Ensure bins are unique and sorted
+    bins = sorted(set(bins))
+
+    binned_returns: pd.Series = query_result.groupby(pd.cut(query_result['profit_rel'], bins)).size()
+    result: dict = {
+        'bins': format_bin_return(binned_returns),
+        'counts': binned_returns.values.tolist()
+    }
+
+    return json.dumps(result)
+
+def format_bin_return(binned_returns, decimal_places: int = 3):
+    binned_returns_formatted = []
+    for i in range(len(binned_returns)):
+        binned_return = str(binned_returns.keys()[i]).split(',')
+        binned_return = str(binned_return[0]) + '% ' + str(binned_return[1]) + '%'
+        binned_return = binned_return.replace('(','').replace(']','').replace(' ', '')
+        binned_return = binned_return.split('%')
+
+        if binned_return[0].find('e') != -1:
+            binned_return[0] = '0.'
+            for i in range(decimal_places):
+                binned_return[0] += '0'
+        if binned_return[1].find('e') != -1:
+            binned_return[1] = '0.'
+            for i in range(decimal_places):
+                binned_return[1] += '0'
+
+        decimal_splitted = binned_return[0].split('.')
+        if len(decimal_splitted[1]) < decimal_places:
+            for i in range(decimal_places - len(decimal_splitted[1])):
+                decimal_splitted[1] += '0'
+        binned_return[0] = decimal_splitted[0] + '.' + decimal_splitted[1][0:decimal_places]
+        
+
+        decimal_splitted = binned_return[1].split('.')
+        binned_return[1] = decimal_splitted[0] + '.' + decimal_splitted[1][0:decimal_places]
+        if len(decimal_splitted[1]) < decimal_places:
+            for i in range(decimal_places - len(decimal_splitted[1])):
+                decimal_splitted[1] += '0'
+        binned_return[1] = decimal_splitted[0] + '.' + decimal_splitted[1][0:decimal_places]
+
+        binned_return = binned_return[0] +'% - '+ binned_return[1] + '%'
+        binned_returns_formatted.append(binned_return)
+    return binned_returns_formatted

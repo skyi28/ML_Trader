@@ -120,7 +120,7 @@ header {
     overflow: hidden; /* Prevent overflow */
 }
 
-.graph-section, .trades-section, .buttons-section, .stop-loss-section {
+.graph-section, .trades-section, .buttons-section, .stop-loss-section, .trades-histogram-section {
     background-color: #011627;
     border-radius: 10px;
     padding: 20px;
@@ -149,6 +149,24 @@ header {
     width: 100% !important; /* Full width of its container */
     height: 100% !important; /* Full height of its container */
     min-height: 300px; /* Ensure a minimum height for the graph */
+}
+
+.columns {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    gap: 20px; /* Adjust spacing between columns */
+}
+
+.trades-histogram-container, .money-development-container {
+    flex: 1; /* Ensures the graph container fills the available space */
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    justify-content: center; /* Center the graph vertically */
+    align-items: center; /* Center the graph horizontally */
+    min-height: 100px; /* Minimum height for the graph container */
+    max-height: 300px;;
+    width: 100%; /* Full width of the container */
 }
 
 .trades-section {

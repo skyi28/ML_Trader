@@ -109,6 +109,50 @@
                     <li><strong>Current Prediction:</strong></li>
                 </ul>
             </div>
+            <div class="trades-histogram-section">
+                <div class="columns">
+                    <!-- Left Column -->
+                    <div class="money-development-container">
+                        <canvas id="money-development"></canvas>
+                    </div>
+                    
+                    <!-- Right Column -->
+                    <div class="trades-histogram-container">
+                        <canvas id="trades-histogram"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="trades-section">
+                <h2>Last Trades</h2>
+                <!-- TODO Create a histogram of the trade returns -->
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Side</th>
+                            <th>Entry Price</th>
+                            <th>Close Price</th>
+                            <th>Return</th>
+                            <th>TP Triggered</th>
+                            <th>SL Triggered</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for trade in trades%}
+                            <tr>
+                                <td>{{ trade[0] }}</td>
+                                <td>{{ trade[1] }}</td>
+                                <td>{{ trade[2] }}</td>
+                                <td>{{ trade[3] }}</td>
+                                <td>{{ trade[4] * 100 }}%</td>
+                                <td>{{ trade[5] }}</td>
+                                <td>{{ trade[6] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
             <!-- Training Metrics Section -->
             <div class="training-metrics-section" id="training-metrics-section">
                 <h2>Training Metrics</h2>
@@ -226,36 +270,6 @@
                     </div>
                 </div>
             </div>
-            <div class="trades-section">
-                <h2>Last Trades</h2>
-                <!-- TODO Create a histogram of the trade returns -->
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Time</th>
-                            <th>Side</th>
-                            <th>Entry Price</th>
-                            <th>Close Price</th>
-                            <th>Return</th>
-                            <th>TP Triggered</th>
-                            <th>SL Triggered</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for trade in trades%}
-                            <tr>
-                                <td>{{ trade[0] }}</td>
-                                <td>{{ trade[1] }}</td>
-                                <td>{{ trade[2] }}</td>
-                                <td>{{ trade[3] }}</td>
-                                <td>{{ trade[4] * 100 }}%</td>
-                                <td>{{ trade[5] }}</td>
-                                <td>{{ trade[6] }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
         </div>
     </div>
     <!-- Up button -->
@@ -274,10 +288,14 @@
             updateStopLossPrice(user, bot_id, symbol, true);
             initialilzeTrailingStopLoss(user, bot_id);
             updateTakeProfitPrice(user, bot_id, symbol, true);
+            createHistogramChart(user, bot_id);
         }
 
         const ctx = document.getElementById('lineGraph').getContext('2d');
         var lineGraph = fetch_chart_data(symbol, 100, 'True', user, bot_id, ctx);
+
+        const ctx2 = document.getElementById('money-development').getContext('2d');
+        var moneyDevelopmentChart = fetch_money_development_chart_data(user, bot_id, ctx2);
 
         function checkBotRunning(user, bot_id){
             const button = document.getElementById('startStopBot');

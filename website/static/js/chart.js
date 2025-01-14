@@ -47,6 +47,39 @@ function fetch_chart_data(symbol, entries, return_trades, user, bot_id, ctx) {
     })
 }
 
+function fetch_money_development_chart_data(user, bot_id, ctx){
+    $.ajax({
+        url: '/api/get_money_development_data/' + user + '/' + bot_id,
+        type: 'GET',
+        data: {
+            user: user,
+            bot_id: bot_id
+        },
+        success: function(response) {
+            response = $.parseJSON(response);
+            console.log(response);
+            console.log('RESPONSE DATES: ' + response['dates']);
+            console.log('RESPONSE MONEY: ' + response['money']);
+            lineGraph = createLineGraph(
+                ctx,
+                response['dates'], // Labels
+                response['money'], // Data
+                'money', // Label 
+                'rgba(75, 192, 192, 1)', // Line color
+                'rgba(75, 192, 192, 0.2)', // Fill color
+                'Time', // X-axis title
+                'Money in BTC' // Y-axis title
+            );
+
+            return lineGraph;
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching money development chart data:', error);
+        }
+    });
+
+}
+
 function createLineGraphWithTrades(ctx, labels, data, label, shortPositions, longPositions, shortPrices, longPrices, borderColor, backgroundColor, xAxisTitle, yAxisTitle) {
     const positionInfo = new Array(data.length).fill('');
     const priceInfo = new Array(data.length).fill('');
@@ -124,6 +157,13 @@ function createLineGraphWithTrades(ctx, labels, data, label, shortPositions, lon
                             const position = positionInfo[context.dataIndex];
                             return `${label}: $${value} (${position})`;
                         }
+                    }
+                },
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        color: 'white'
                     }
                 }
             }
@@ -216,4 +256,74 @@ function createLineGraph(ctx, labels, data, label, borderColor, backgroundColor,
           }
       }
   });
+}
+
+function createHistogramChart(user, bot_id){
+    const ctx = document.getElementById('trades-histogram').getContext('2d');
+    let data;
+
+    $.ajax({
+        url: '/api/data_for_trades_histogram/' + user + '/' + bot_id + '/10',
+        type: 'GET',
+        data: {
+            user: user,
+            bot_id: bot_id,
+            bins: '11'
+        },
+        success: function(response) {
+            data = $.parseJSON(response);
+            let bins = data['bins'];
+            let counts = data['counts'];
+
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: bins,
+                    datasets: [{
+                        label: 'Trade Returns Distribution',
+                        data: counts,
+                        backgroundColor: '#4BC0C0',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                color: 'white'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Trade Returns',
+                                color: 'white'
+                            },
+                            ticks: {
+                                color: 'white'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Frequency',
+                                color: 'white'
+                            },
+                            ticks: {
+                                color: 'white'
+                            }
+                        }
+                    }
+                }
+            });
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching trade histogram data:', error);
+        }
+    });
 }

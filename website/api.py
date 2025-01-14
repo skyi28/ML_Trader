@@ -69,7 +69,7 @@ def chart_data() -> dict:
 
         for _, trade in trades.iterrows():
             trade_time = trade['timestamp']
-            trade_time: str = datetime.datetime.strftime(trade_time, '%Y-%d-%m %H:%M:%S') 
+            trade_time: str = datetime.datetime.strftime(trade_time, '%Y-%m-%d %H:%M:%S') 
             trade_time = pd.to_datetime(trade_time)
             price_time_diff = (prices['timestamp'] - trade_time).abs()
             closest_price_index = price_time_diff.idxmin()

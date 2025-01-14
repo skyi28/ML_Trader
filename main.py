@@ -49,7 +49,7 @@ config = load_config(f'{path_to_config}{os.sep}config{os.sep}config.yaml')
 def start_postgres():
     try:
         # Run the command to start PostgreSQL service
-        subprocess.run(['sudo', 'service', 'postgresql', 'start'], check=True)
+        subprocess.run(['sudo', '-S', 'service', 'postgresql', 'start'], input=f'{config.sudo_password}', check=True, text=True)
         print("PostgreSQL service started successfully.")
     except subprocess.CalledProcessError as e:
         print(f"Failed to start PostgreSQL service: {e}")

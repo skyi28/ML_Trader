@@ -1,6 +1,8 @@
 # Application configuration
 # Use <<project_root> as placeholder for the project root directory
 
+sudo_password: root
+
 logging:
   log_level: INFO
   log_folder: <<project_root>>/logs/

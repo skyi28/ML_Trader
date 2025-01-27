@@ -463,17 +463,21 @@ class Database:
         data = self.execute_read_query(query)
         return data[0] if data else None
     
-    def delete_bot_by_id(self, bot_id: int) -> None:
+    def delete_bot_by_id(self, user: int, bot_id: int) -> None:
         """
         Deletes a bot from the 'bots' table in the PostgreSQL database based on its unique identifier.
 
         Parameters:
+        - user (int): The unique identifier of the user who created the bot.
         - bot_id (int): The unique identifier of the bot to be deleted.
 
         Returns:
         - None: The function does not return any value. It deletes the bot from the database.
         """
         query: str = f'DELETE FROM bots WHERE id={bot_id}'
+        self.execute_write_query(query)
+
+        query: str = f"""DELETE FROM trades WHERE "user" = {user} AND bot_id = {bot_id}"""
         self.execute_write_query(query)
         self.commit()
     

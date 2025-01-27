@@ -328,7 +328,8 @@ def bot_delete(bot_id: int) -> redirect:
     - This function is decorated with @login_required, which ensures that only authenticated users can access this route.
     - Before deleting the bot, a TODO comment suggests checking if the bot is currently running. This functionality is not implemented in the provided code.
     """
-    postgres_db.delete_bot_by_id(bot_id)
+    user: int = current_user.get_id()
+    postgres_db.delete_bot_by_id(user, bot_id)
     return redirect('/bot_overview')
 
 

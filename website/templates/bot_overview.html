@@ -40,8 +40,10 @@
                             <td>{{ bot[5] }}</td>
                             <td>{{ bot[7] }}</td>
                             <td>
+                                {% if no_bots_created == false %}
                                 <button class="details-button"><a href="/bot/{{ bot[0] }}">Details</a></button>
                                 <button class="delete_btn"><a href="/delete_bot/{{ bot[0] }}"><img src="static/images/icons/trashcan.svg"></img></a></button>
+                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}

@@ -357,10 +357,12 @@ def bot_overview():
     """
     if request.method == 'GET':
         bots = postgres_db.get_all_bots_by_user(current_user.get_id())
+        no_bots_created: bool = False
         if not bots:
+            no_bots_created: bool = True
             bots: list[list[str]] = [['' for _ in range(8)]]
             bots[0][3] = 'You have not created a bot yet.'
-        return render_template('bot_overview.html', user=current_user, bots=bots)
+        return render_template('bot_overview.html', user=current_user, bots=bots, no_bots_created=no_bots_created)
 
 
 @login_required

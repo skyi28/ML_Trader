@@ -24,10 +24,12 @@ sys.path.append(path_to_config)
 
 import threading
 import subprocess
+import pandas as pd
 
 from config.config import load_config
 from infrastructure.database import Database
 from infrastructure.bybit_data import BybitData
+from infrastructure.fill_gaps import GapFiller
 from models.execute_models import ExecuteModels
 from infrastructure.logger import create_logger
 from website.app import create_app
@@ -86,6 +88,20 @@ for symbol in config.tradeable_symbols:
     column_names_and_types = ['symbol VARCHAR', '"timestamp" TIMESTAMP', 'last_price FLOAT', 'bid_price FLOAT', 'ask_price FLOAT', 'bid_size FLOAT', 'ask_size FLOAT', 'price_change_last_24h FLOAT']
     unique_constraints = ['symbol']
     db.create_table('prices', column_names_and_types, unique_constraints)
+
+# Identify any gaps in the historical data and fill them if they exist.
+# Download the missing historical data since the last start of the application.
+gap_filler = GapFiller()
+for symbol in config.tradeable_symbols:
+    # Fill gaps
+    gaps: list[tuple[pd.Timestamp, pd.Timestamp]] = gap_filler.fetch_gaps(symbol.lower())
+    logger.info(f'Checking for gaps in the historical data of {symbol}: {len(gaps)} found!')
+    gap_filler.fill_gaps(symbol.lower())
+    if len(gaps) > 0:
+        logger.info(f'Filled gaps in the historical data of {symbol}.')
+
+    # Download the missing data since the last start of the application
+    gap_filler.download_missing_data_since_last_application_start(symbol)
     
 logger.info('Starting ByBit data thread')
 bd = BybitData()

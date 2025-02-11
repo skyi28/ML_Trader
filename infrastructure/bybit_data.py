@@ -134,7 +134,7 @@ class BybitData:
         response_hist_price = json.loads(requests.get(self.hist_prices_url, params).text)
         response_hist_price = response_hist_price["result"]["list"]
         
-        timestamps = reversed([pd.to_datetime(datetime.datetime.fromtimestamp(int(response_hist_price[i][0][:-3]))) for i in range(len(response_hist_price))])
+        timestamps = reversed([pd.to_datetime(datetime.datetime.fromtimestamp(int(response_hist_price[i][0][:-3]), tz=datetime.timezone.utc).replace(tzinfo=None)) for i in range(len(response_hist_price))])
         open_prices = reversed([float(response_hist_price[i][1]) for i in range(len(response_hist_price))])
         close_prices = reversed([float(response_hist_price[i][4]) for i in range(len(response_hist_price))])
         
@@ -162,7 +162,9 @@ class BybitData:
         data = []
     # try:
         if start and end:
-            next_end = start + datetime.timedelta(minutes=int(interval)*limit)
+            # TODO find the largest number of time periods, currently hardcoded.
+            start = start - datetime.timedelta(minutes=26) # Since the technical indicators are calculated and na's are dropped the largest number of time periods of the technical indicatos must be substracte.
+            next_end = start + datetime.timedelta(minutes=int(interval)*limit) - datetime.timedelta(minutes=26) # Since the technical indicators are calculated and na's are dropped the largest number of time periods of the technical indicatos must be substracte.
             data.append(self.get_data_helper(start, next_end, symbol, interval, limit))
         
             while data[-1]["Timestamp"].iloc[-1] < end:
@@ -181,9 +183,6 @@ class BybitData:
             
         data = pd.concat(data, axis=0)
         data.reset_index(inplace=True, drop=True)
-        if end:
-            data = data.loc[data["Timestamp"] <= end]
-        self.logger.info(f"{len(data)} data points retrieved for {symbol} from {start} to {end}.")
         
         if calc_technical_indicators:
             for indicator in self.config.technical_indicators.indicators:
@@ -197,7 +196,11 @@ class BybitData:
                     self.logger.error(f"Error calculating technical indicator {indicator} for {symbol}. \n{e}")
             data.dropna(inplace=True)
             data.reset_index(inplace=True, drop=True)
-        
+
+        if end:
+            data = data.loc[data["Timestamp"] <= end]
+        self.logger.info(f"{len(data)} data points retrieved for {symbol} from {start} to {end}.")
+
         return data
     
     def insert_historical_data(self, symbol: str, data: pd.DataFrame) -> None:

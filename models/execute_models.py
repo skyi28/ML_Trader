@@ -39,6 +39,9 @@ class ExecuteModels:
         self.db: Database = Database()
         self.ptd: PrepareTrainingData = PrepareTrainingData()
         self.TRADING_FEE: float = float(self.config.trading_fees)
+
+    def stop_loss_trake_profit_loop(self) -> None:
+        pass
         
     def prediction_loop(self) -> None:
         """
